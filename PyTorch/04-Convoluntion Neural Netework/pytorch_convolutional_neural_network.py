@@ -35,11 +35,13 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                            batch_size=batch_size,
                                            shuffle=True)
 
-# 包含一个隐藏层的全连接层
+# 卷积神经网络
 class ConvNet(nn.Module):
     def __init__(self, num_classes=10):
         super(ConvNet, self).__init__()
         self.layer1 = nn.Sequential(
+            # input channel(C_in), output channel(C_out) C_in * H * W
+            # H_out = (H - kernel_size + 2 * padding) / stride + 1 
             nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2),
             nn.BatchNorm2d(16),
             nn.ReLU(),
