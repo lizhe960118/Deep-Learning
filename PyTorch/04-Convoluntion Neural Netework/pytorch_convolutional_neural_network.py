@@ -14,7 +14,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # 定义网络参数
 num_classes = 10
-num_epochs = 5
+num_epochs = 1
 batch_size = 100
 learning_rate = 0.001
 
@@ -73,11 +73,13 @@ total_steps = len(train_loader)
 for epoch in range(num_epochs):
     for i, (images, labels) in enumerate(train_loader):
         #  reshape images to (batch, input_size)
+        # print(images.shape)
         images = images.to(device)
         labels = labels.to(device)
 
         # forward pass
         outputs = model(images)
+        # print(outputs.shape)
         loss = criterion(outputs, labels)
 
         # backward pass
@@ -101,10 +103,13 @@ with torch.no_grad():
 
         # forward pass
         outputs = model(images)
+        # print(outputs.data.shape, type(outputs.data))
+        # print(outputs.shape, type(outputs))
+
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
-        print('Accuracy of the model on the 10000 test images: {}%'.format(100 * correct / total))
+        print('Accuracy of the model on the 100 test images: {}%'.format(100 * correct / total))
 
 # Save the model checkpoint
 torch.save(model.state_dict(), 'model.ckpt')
