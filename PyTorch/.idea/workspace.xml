@@ -22,41 +22,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="simple_GAN.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
+      <file leaf-file-name="Conditional_DCGAN.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/Conditional_DCGAN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="21" lean-forward="false" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
-              <folding>
-                <element signature="e#101#113#0" expanded="true" />
-                <marker date="1542115393040" expanded="true" signature="1900:3622" ph="..." />
-                <marker date="1542115393040" expanded="true" signature="1946:3375" ph="..." />
-                <marker date="1542115393040" expanded="true" signature="2779:2850" ph="..." />
-                <marker date="1542115393040" expanded="true" signature="3163:3375" ph="..." />
-                <marker date="1542115393040" expanded="true" signature="3395:3502" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pytorch_convolutional_neural_network.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/04-Convoluntion-Neural-Netework/pytorch_convolutional_neural_network.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="58" column="28" lean-forward="false" selection-start-line="58" selection-start-column="28" selection-end-line="58" selection-end-column="28" />
+            <state relative-caret-position="583">
+              <caret line="113" column="0" lean-forward="false" selection-start-line="113" selection-start-column="0" selection-end-line="116" selection-end-column="44" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="conv_gan.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/conv_gan.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="137" column="38" lean-forward="false" selection-start-line="137" selection-start-column="38" selection-end-line="137" selection-end-column="38" />
-              <folding>
-                <element signature="e#101#113#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -73,6 +44,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>rand</find>
+      <find>image</find>
     </findStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -89,6 +61,8 @@
         <option value="$PROJECT_DIR$/04-Convoluntion Neural Netework/pytorch_convolutional_neural_network.py" />
         <option value="$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py" />
         <option value="$PROJECT_DIR$/09-Generative-Adversarial-Network/conv_gan.py" />
+        <option value="$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py" />
+        <option value="$PROJECT_DIR$/09-Generative-Adversarial-Network/Conditional_DCGAN.py" />
       </list>
     </option>
   </component>
@@ -98,10 +72,9 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="548" />
-    <option name="y" value="108" />
-    <option name="width" value="1101" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="870" />
+    <option name="width" value="952" />
     <option name="height" value="1047" />
   </component>
   <component name="ProjectView">
@@ -135,6 +108,11 @@
             <path>
               <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
               <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
+              <item name="05-Recurrent-Neural_Network" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
               <item name="09-Generative-Adversarial-Network" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -161,12 +139,16 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\李大哲\Desktop\Deep-Learning\PyTorch\09-Generative-Adversarial-Network" />
+      <recent name="C:\Users\李大哲\Desktop\Deep-Learning\PyTorch\05-Recurrent-Neural_Network" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\李大哲\Desktop\Deep-Learning\PyTorch" />
       <recent name="C:\Users\李大哲\Desktop\code\Deep Learning\PyTorch" />
       <recent name="C:\Users\李大哲\Desktop\code\Deep Learning\PyTorch\00-Basic use" />
       <recent name="C:\Users\李大哲\Desktop\code\Deep Learning\PyTorch\data\CIFAR10\cifar-10-batches-py" />
       <recent name="C:\Users\李大哲\Desktop\code\Deep Learning\PyTorch\data\CIFAR10" />
-      <recent name="C:\Users\李大哲\Desktop\code\Deep Learning\PyTorch\data\MNIST" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -312,9 +294,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="548" y="108" width="1101" height="1047" extended-state="1" />
+    <frame x="870" y="0" width="952" height="1047" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24111432" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28475335" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32822758" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -348,11 +331,64 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1650">
+          <caret line="81" column="27" lean-forward="false" selection-start-line="81" selection-start-column="27" selection-end-line="81" selection-end-column="27" />
+          <folding>
+            <element signature="e#101#113#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/Conditional_DCGAN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3894">
+          <caret line="189" column="15" lean-forward="false" selection-start-line="189" selection-start-column="15" selection-end-line="189" selection-end-column="15" />
+          <folding>
+            <element signature="e#101#110#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1782">
+          <caret line="81" column="27" lean-forward="false" selection-start-line="81" selection-start-column="27" selection-end-line="81" selection-end-column="27" />
+          <folding>
+            <element signature="e#101#113#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/Conditional_DCGAN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4070">
+          <caret line="185" column="12" lean-forward="false" selection-start-line="185" selection-start-column="12" selection-end-line="185" selection-end-column="12" />
+          <folding>
+            <element signature="e#101#110#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/04-Convoluntion-Neural-Netework/pytorch_convolutional_neural_network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2750">
+          <caret line="129" column="0" lean-forward="true" selection-start-line="129" selection-start-column="0" selection-end-line="129" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/TensorBoard_use/pytorch_tensorboard_use.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -360,7 +396,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="418">
           <caret line="19" column="0" lean-forward="true" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -370,11 +405,6 @@
           <caret line="82" column="39" lean-forward="true" selection-start-line="82" selection-start-column="39" selection-end-line="82" selection-end-column="39" />
           <folding>
             <element signature="e#101#113#0" expanded="true" />
-            <marker date="1542115393040" expanded="true" signature="1900:3622" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="1946:3375" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="2779:2850" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="3163:3375" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="3395:3502" ph="..." />
           </folding>
         </state>
       </provider>
@@ -383,7 +413,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2420">
           <caret line="110" column="36" lean-forward="false" selection-start-line="110" selection-start-column="36" selection-end-line="110" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -391,7 +420,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2156">
           <caret line="101" column="34" lean-forward="false" selection-start-line="101" selection-start-column="34" selection-end-line="101" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -399,7 +427,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2332">
           <caret line="110" column="36" lean-forward="false" selection-start-line="110" selection-start-column="36" selection-end-line="110" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -407,7 +434,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2222">
           <caret line="101" column="34" lean-forward="true" selection-start-line="101" selection-start-column="34" selection-end-line="101" selection-end-column="34" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -415,7 +441,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -430,7 +455,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -445,7 +469,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="264">
           <caret line="16" column="16" lean-forward="false" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -493,40 +516,46 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="539">
           <caret line="110" column="36" lean-forward="false" selection-start-line="110" selection-start-column="36" selection-end-line="110" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/04-Convoluntion-Neural-Netework/pytorch_convolutional_neural_network.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="58" column="28" lean-forward="false" selection-start-line="58" selection-start-column="28" selection-end-line="58" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="21" lean-forward="false" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
-          <folding>
-            <element signature="e#101#113#0" expanded="true" />
-            <marker date="1542115393040" expanded="true" signature="1900:3622" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="1946:3375" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="2779:2850" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="3163:3375" ph="..." />
-            <marker date="1542115393040" expanded="true" signature="3395:3502" ph="..." />
-          </folding>
+        <state relative-caret-position="287">
+          <caret line="100" column="34" lean-forward="true" selection-start-line="100" selection-start-column="34" selection-end-line="100" selection-end-column="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/conv_gan.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
-          <caret line="137" column="38" lean-forward="false" selection-start-line="137" selection-start-column="38" selection-end-line="137" selection-end-column="38" />
+        <state relative-caret-position="330">
+          <caret line="110" column="24" lean-forward="false" selection-start-line="110" selection-start-column="24" selection-end-line="110" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding>
             <element signature="e#101#113#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="93">
+          <caret line="38" column="31" lean-forward="true" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/Conditional_DCGAN.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="583">
+          <caret line="113" column="0" lean-forward="false" selection-start-line="113" selection-start-column="0" selection-end-line="116" selection-end-column="44" />
+          <folding />
         </state>
       </provider>
     </entry>

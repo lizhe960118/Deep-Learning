@@ -20,3 +20,7 @@
 *.zip
 *.tar.gz
 *.rar
+
+PyTorch/data/
+PyTorch/09-Generative-Adversarial-Network/img/
+PyTorch/09-Generative-Adversarial-Network/dc_img/
