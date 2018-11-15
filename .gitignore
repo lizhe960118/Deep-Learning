@@ -21,6 +21,9 @@
 *.tar.gz
 *.rar
 
+*jpg
+
 PyTorch/data/
 PyTorch/09-Generative-Adversarial-Network/img/
 PyTorch/09-Generative-Adversarial-Network/dc_img/
+PyTorch/Make_own_datasets/mnist_test/

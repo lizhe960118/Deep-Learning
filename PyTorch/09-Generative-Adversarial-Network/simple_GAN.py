@@ -11,6 +11,10 @@ from torchvision import datasets
 from torchvision import transforms
 from torchvision.utils import save_image
 from torch.autograd import Variable
+import os
+
+if not os.path.exists('./img'):
+    os.mkdir('./img')
 
 def to_img(x):
     out = 0.5 * (x + 1)
