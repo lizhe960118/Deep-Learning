@@ -10,73 +10,31 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/PyTorch$cifar10_tutorial.coverage" NAME="cifar10_tutorial Coverage Results" MODIFIED="1541062113485" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/00-old version" />
     <SUITE FILE_PATH="coverage/PyTorch$change_mnist2img.coverage" NAME="change_mnist2img Coverage Results" MODIFIED="1542260211536" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Make_own_datasets" />
-    <SUITE FILE_PATH="coverage/PyTorch$mydataset_from_mnist.coverage" NAME="mydataset_from_mnist Coverage Results" MODIFIED="1542261505463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Make_own_datasets" />
     <SUITE FILE_PATH="coverage/PyTorch$pytorch_feedforwrad_neural_network.coverage" NAME="pytorch_feedforwrad_neural_network Coverage Results" MODIFIED="1541075149710" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/03-Feedforward Neural Network" />
     <SUITE FILE_PATH="coverage/PyTorch$pytorch_tensorboard_use.coverage" NAME="pytorch_tensorboard_use Coverage Results" MODIFIED="1541125359629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/TensorBoard_use" />
-    <SUITE FILE_PATH="coverage/PyTorch$pytorch_logistic_regression.coverage" NAME="pytorch_logistic_regression Coverage Results" MODIFIED="1541065533620" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/02-Logistic Regression" />
+    <SUITE FILE_PATH="coverage/PyTorch$bag_of_word.coverage" NAME="bag_of_word Coverage Results" MODIFIED="1542267510522" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/06-Natural-Language-Process" />
     <SUITE FILE_PATH="coverage/PyTorch$pytorch_basic.coverage" NAME="pytorch_basic Coverage Results" MODIFIED="1541046557171" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/01-Basics" />
+    <SUITE FILE_PATH="coverage/PyTorch$seq_lstm.coverage" NAME="seq-lstm Coverage Results" MODIFIED="1542334556508" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/06-Natural-Language-Process" />
+    <SUITE FILE_PATH="coverage/PyTorch$pytorch_convolutional_neural_network.coverage" NAME="pytorch_convolutional_neural_network Coverage Results" MODIFIED="1541423578995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/04-Convoluntion Neural Netework" />
+    <SUITE FILE_PATH="coverage/PyTorch$cifar10_tutorial.coverage" NAME="cifar10_tutorial Coverage Results" MODIFIED="1541062113485" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/00-old version" />
+    <SUITE FILE_PATH="coverage/PyTorch$mydataset_from_mnist.coverage" NAME="mydataset_from_mnist Coverage Results" MODIFIED="1542261505463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Make_own_datasets" />
+    <SUITE FILE_PATH="coverage/PyTorch$pytorch_logistic_regression.coverage" NAME="pytorch_logistic_regression Coverage Results" MODIFIED="1541065533620" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/02-Logistic Regression" />
     <SUITE FILE_PATH="coverage/PyTorch$mydataset_from_flowers.coverage" NAME="mydataset_from_flowers Coverage Results" MODIFIED="1542262794926" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Make_own_datasets" />
     <SUITE FILE_PATH="coverage/PyTorch$simple_GAN.coverage" NAME="simple_GAN Coverage Results" MODIFIED="1542098359563" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/09-Generative-Adversarial-Network" />
     <SUITE FILE_PATH="coverage/PyTorch$pytorch_linear_regression.coverage" NAME="pytorch_linear_regression Coverage Results" MODIFIED="1541079915767" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/01-Basics" />
-    <SUITE FILE_PATH="coverage/PyTorch$pytorch_convolutional_neural_network.coverage" NAME="pytorch_convolutional_neural_network Coverage Results" MODIFIED="1541423578995" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/04-Convoluntion Neural Netework" />
     <SUITE FILE_PATH="coverage/PyTorch$neural_networks_tutorial.coverage" NAME="neural_networks_tutorial Coverage Results" MODIFIED="1541061403695" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/00-old version" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="simple_GAN.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
+      <file leaf-file-name="bag_of_word.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/06-Natural-Language-Process/bag_of_word.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="16" column="16" lean-forward="false" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+            <state relative-caret-position="330">
+              <caret line="24" column="23" lean-forward="false" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="44" />
               <folding>
-                <element signature="e#101#113#0" expanded="true" />
+                <element signature="e#282#309#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="conv_gan.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/conv_gan.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="16" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="mydataset_from_mnist.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Make_own_datasets/mydataset_from_mnist.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="517">
-              <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-              <folding>
-                <element signature="e#101#142#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="mydataset_from_flowers.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Make_own_datasets/mydataset_from_flowers.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="233">
-              <caret line="15" column="46" lean-forward="true" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
-              <folding>
-                <element signature="e#101#113#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="recurrent_neural_network.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-506">
-              <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -115,6 +73,8 @@
         <option value="$PROJECT_DIR$/Make_own_datasets/change_mnist2img.py" />
         <option value="$PROJECT_DIR$/Make_own_datasets/mydataset_from_mnist.py" />
         <option value="$PROJECT_DIR$/Make_own_datasets/mydataset_from_flowers.py" />
+        <option value="$PROJECT_DIR$/06-Natural-Language-Process/bag_of_word.py" />
+        <option value="$PROJECT_DIR$/06-Natural-Language-Process/seq-lstm.py" />
       </list>
     </option>
   </component>
@@ -125,8 +85,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="492" />
-    <option name="y" value="37" />
+    <option name="x" value="837" />
+    <option name="y" value="8" />
     <option name="width" value="1053" />
     <option name="height" value="1047" />
   </component>
@@ -145,7 +105,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -156,33 +115,14 @@
             <path>
               <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
               <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
-              <item name="04-Convoluntion-Neural-Netework" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
               <item name="05-Recurrent-Neural_Network" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
-              <item name="09-Generative-Adversarial-Network" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="PyTorch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="PyTorch" type="462c0819:PsiDirectoryNode" />
-              <item name="Make_own_datasets" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -215,7 +155,25 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.mydataset_from_flowers">
+  <component name="RunManager" selected="Python.seq-lstm">
+    <configuration name="bag_of_word" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/06-Natural-Language-Process" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="PyTorch" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/06-Natural-Language-Process/bag_of_word.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <configuration name="change_mnist2img" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -270,56 +228,38 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <configuration name="pytorch_convolutional_neural_network" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="seq-lstm" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/04-Convoluntion Neural Netework" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/06-Natural-Language-Process" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="PyTorch" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/04-Convoluntion Neural Netework/pytorch_convolutional_neural_network.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="simple_GAN" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/09-Generative-Adversarial-Network" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="PyTorch" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/06-Natural-Language-Process/seq-lstm.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.pytorch_convolutional_neural_network" />
-      <item index="1" class="java.lang.String" itemvalue="Python.simple_GAN" />
-      <item index="2" class="java.lang.String" itemvalue="Python.change_mnist2img" />
-      <item index="3" class="java.lang.String" itemvalue="Python.mydataset_from_mnist" />
-      <item index="4" class="java.lang.String" itemvalue="Python.mydataset_from_flowers" />
+      <item index="0" class="java.lang.String" itemvalue="Python.change_mnist2img" />
+      <item index="1" class="java.lang.String" itemvalue="Python.mydataset_from_mnist" />
+      <item index="2" class="java.lang.String" itemvalue="Python.mydataset_from_flowers" />
+      <item index="3" class="java.lang.String" itemvalue="Python.bag_of_word" />
+      <item index="4" class="java.lang.String" itemvalue="Python.seq-lstm" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.mydataset_from_flowers" />
-        <item index="1" class="java.lang.String" itemvalue="Python.mydataset_from_mnist" />
-        <item index="2" class="java.lang.String" itemvalue="Python.change_mnist2img" />
-        <item index="3" class="java.lang.String" itemvalue="Python.simple_GAN" />
-        <item index="4" class="java.lang.String" itemvalue="Python.pytorch_convolutional_neural_network" />
+        <item index="0" class="java.lang.String" itemvalue="Python.seq-lstm" />
+        <item index="1" class="java.lang.String" itemvalue="Python.bag_of_word" />
+        <item index="2" class="java.lang.String" itemvalue="Python.mydataset_from_flowers" />
+        <item index="3" class="java.lang.String" itemvalue="Python.mydataset_from_mnist" />
+        <item index="4" class="java.lang.String" itemvalue="Python.change_mnist2img" />
       </list>
     </recent_temporary>
   </component>
@@ -346,16 +286,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="492" y="37" width="1053" height="1047" extended-state="0" />
-    <editor active="true" />
+    <frame x="837" y="8" width="1053" height="1047" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25579053" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3343404" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32822758" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32821077" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32711306" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32711306" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33040616" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -385,10 +324,56 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="16" column="16" lean-forward="false" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+          <folding>
+            <element signature="e#101#113#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/conv_gan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="16" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Make_own_datasets/mydataset_from_mnist.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="990">
+          <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
+          <folding>
+            <element signature="e#101#142#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Make_own_datasets/mydataset_from_flowers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="15" column="46" lean-forward="true" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
+          <folding>
+            <element signature="e#101#113#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1650">
           <caret line="81" column="27" lean-forward="false" selection-start-line="81" selection-start-column="27" selection-end-line="81" selection-end-column="27" />
           <folding>
-            <element signature="e#101#113#0" expanded="true" />
+            <element signature="e#101#113#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -397,9 +382,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3894">
           <caret line="189" column="15" lean-forward="false" selection-start-line="189" selection-start-column="15" selection-end-line="189" selection-end-column="15" />
-          <folding>
-            <element signature="e#101#110#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -408,7 +390,7 @@
         <state relative-caret-position="1782">
           <caret line="81" column="27" lean-forward="false" selection-start-line="81" selection-start-column="27" selection-end-line="81" selection-end-column="27" />
           <folding>
-            <element signature="e#101#113#0" expanded="true" />
+            <element signature="e#101#113#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -417,9 +399,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4070">
           <caret line="185" column="12" lean-forward="false" selection-start-line="185" selection-start-column="12" selection-end-line="185" selection-end-column="12" />
-          <folding>
-            <element signature="e#101#110#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -456,7 +435,7 @@
         <state relative-caret-position="1804">
           <caret line="82" column="39" lean-forward="true" selection-start-line="82" selection-start-column="39" selection-end-line="82" selection-end-column="39" />
           <folding>
-            <element signature="e#101#113#0" expanded="true" />
+            <element signature="e#101#113#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -582,24 +561,15 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="583">
           <caret line="113" column="0" lean-forward="false" selection-start-line="113" selection-start-column="0" selection-end-line="116" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-506">
-          <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/09-Generative-Adversarial-Network/simple_GAN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
+        <state relative-caret-position="198">
           <caret line="16" column="16" lean-forward="false" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
           <folding>
-            <element signature="e#101#113#0" expanded="true" />
+            <element signature="e#101#113#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -608,9 +578,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="475">
           <caret line="22" column="30" lean-forward="true" selection-start-line="22" selection-start-column="30" selection-end-line="22" selection-end-column="30" />
-          <folding>
-            <element signature="e#102#114#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -624,20 +591,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Make_own_datasets/mydataset_from_mnist.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="517">
+        <state relative-caret-position="575">
           <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
           <folding>
-            <element signature="e#101#142#0" expanded="true" />
+            <element signature="e#101#142#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Make_own_datasets/mydataset_from_flowers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="233">
-          <caret line="15" column="46" lean-forward="true" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
+        <state relative-caret-position="311">
+          <caret line="15" column="46" lean-forward="false" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
           <folding>
-            <element signature="e#101#113#0" expanded="true" />
+            <element signature="e#101#113#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/05-Recurrent-Neural_Network/recurrent_neural_network.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1232">
+          <caret line="38" column="31" lean-forward="false" selection-start-line="38" selection-start-column="31" selection-end-line="38" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/06-Natural-Language-Process/seq-lstm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2596">
+          <caret line="118" column="10" lean-forward="true" selection-start-line="118" selection-start-column="10" selection-end-line="118" selection-end-column="10" />
+          <folding>
+            <element signature="e#101#128#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/06-Natural-Language-Process/bag_of_word.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="24" column="23" lean-forward="false" selection-start-line="24" selection-start-column="23" selection-end-line="24" selection-end-column="44" />
+          <folding>
+            <element signature="e#282#309#0" expanded="true" />
           </folding>
         </state>
       </provider>

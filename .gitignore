@@ -26,4 +26,5 @@
 PyTorch/data/
 PyTorch/09-Generative-Adversarial-Network/img/
 PyTorch/09-Generative-Adversarial-Network/dc_img/
+PyTorch/09-Generative-Adversarial-Network/CGAN_samples/
 PyTorch/Make_own_datasets/mnist_test/
