@@ -24,6 +24,7 @@
 *jpg
 
 PyTorch/data/
+PyTorch/.idea/
 PyTorch/09-Generative-Adversarial-Network/img/
 PyTorch/09-Generative-Adversarial-Network/dc_img/
 PyTorch/09-Generative-Adversarial-Network/CGAN_samples/
