@@ -145,11 +145,7 @@ class DenseNet(nn.Module):
             nn.AvgPool2d(7)
             )
         
-        self.fc = nn.Sequential(
-            nn.Linear(in_channel, num_classes),
-            nn.ReLU(),
-            nn.Softmax()
-            )
+        self.fc = nn.Linear(in_channel, num_classes)
 
         # 权重初始化
         for m in self.modules():
@@ -183,11 +179,11 @@ class DenseNet(nn.Module):
         out = self.fc(out)
         return out 
 
-def densenet65_32(num_classes=10):
-    model = DenseNet(32, 65, 0.5, num_classes=num_classes, useBottleneck=True)
-    return model
+# def densenet65_32(num_classes=10):
+#     model = DenseNet(32, 65, 0.5, num_classes=num_classes, useBottleneck=True)
+#     return model
 
-densenet65_32 = densenet65_32()
+# densenet65_32 = densenet65_32()
 
 # DenseNet核心思想在于建立了不同层之间的连接关系，充分利用了feature，进一步减轻了梯度消失问题，加深网络不是问题，而且训练效果非常好。
 # 另外，利用bottleneck layer，Translation layer以及较小的growth rate使得网络变窄，参数减少，有效抑制了过拟合，同时计算量也减少了。

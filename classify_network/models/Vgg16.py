@@ -126,4 +126,4 @@ class VGG16_Net(nn.Module):
         out = self.layer8(out)
         return out 
 
-vgg16 = VGG16_Net()
+# vgg16 = VGG16_Net()
