@@ -127,3 +127,6 @@ class VGG16_Net(nn.Module):
         return out 
 
 # vgg16 = VGG16_Net()
+
+class vgg16_model(object):
+    
