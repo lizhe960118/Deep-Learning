@@ -47,7 +47,7 @@ class ResNetBasicBlock(nn.Module):
 
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=1000):
-        # 输入 224 * 224 * 3
+        # 输入 32 * 32 * 3
         super(ResNet,self).__init__()
         # 首先找到ResNet的父类（比如是类nn.Module），然后把类ResNet的对象self转换为类nn.Module的对象，
         # 然后“被转换”的类nn.Module对象调用自己的__init__函数
@@ -81,7 +81,6 @@ class ResNet(nn.Module):
         # 输出512
         self.fc = nn.Sequential(
             nn.Linear(512 * block.expansion, num_classes),
-            nn.ReLU(),
             nn.Softmax()
             ) 
 
