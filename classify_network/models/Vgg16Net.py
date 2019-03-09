@@ -1,5 +1,3 @@
-# https://blog.csdn.net/zyqdragon/article/details/72353420
-
 import torch 
 import torch.nn as nn
 import torchvision
@@ -15,101 +13,119 @@ import shutil
 import numpy as np
 
 """
-# 批处理大小 128
-batch_size = 128
+VGG 的优点在于，堆叠多个小的卷积核而不使用池化操作可以增加网络的表征深度，同时限制参数的数量。
+例如，通过堆叠 3 个 3×3 卷积层而不是使用单个的 7×7 层，可以克服一些限制。
+首先，这样做组合了三个非线性函数，而不只是一个，使得决策函数更有判别力和表征能力。
+第二，参数量减少了 81%，而感受野保持不变。
+另外，小卷积核的使用也扮演了正则化器的角色，并提高了不同卷积核的有效性。
 
-train_dataset = torchvision.datasets.ImageFolder(root='./../data/train_data',
-                                                transform = transforms.ToTensor())
-test_dataset = torchvision.datasets.ImageFolder(root="./../data/train_data",
-                                                transform = transforms.ToTensor())
-
-train_loader = torch.utils.data.DataLoader(dataset = train_dataset,
-                                            batch_size = batch_size,
-                                            shuffle = True)
-test_loader = torch.utils.data.DataLoader(dataset = test_dataset,
-                                            batch_size = batch_size,
-                                            shuffle = True)
+VGG 的缺点在于，其评估的开销比浅层网络更加昂贵，内存和参数（140M）也更多。
+这些参数的大部分都可以归因于第一个全连接层。
+结果表明，这些层可以在不降低性能的情况下移除，同时显著减少了必要参数的数量。
 """
 
-class AlexNet(nn.Module):
+class VGG16_Net(nn.Module):
     def __init__(self, num_classes):
-        super(AlexNet, self).__init__()
+        super(VGG16_Net, self).__init__()
 
-        # 第一层卷积
-        # 输入 （227 * 227 * 3） 卷积（11 * 11 * 3）步长 4 个数 96 
-        # 输出 （227 - 11）/ 4 + 1 = 55 （55 * 55 * 96）
-        # relu1处理 （relu提高训练速度）
-        # 第一层池化 （pool提高精度，防止过拟合）
-        # 尺度 （3 * 3）步长 2
-        # 输出 （55 - 3）/ 2 + 1 = 27 (27 * 27 * 96)
-        # 归一化BN
         self.layer1 = nn.Sequential(
-            # input Channel, output channel, kernel_size, stride, padding
-            nn.Conv2d(3, 96, kernel_size=11, stride=4),
+            # 核心思想用小卷积核代替大卷积核，减少参数
+            # 卷积 1-1
+            # 输入 （224 * 224 * 3） 卷积（3 * 3 * 3）步长 1,填充1， 个数 64
+            # 输出 （224 - 3 + 2 * 1）/ 1 + 1 = 224 （224 * 224 * 64）
+            # 归一化BN
+            # relu处理 （relu提高训练速度）
+            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.BatchNorm2d(96)
+            # 卷积 1-2
+            # 输入 （224 * 224 * 64） 卷积（3 * 3 * 3）步长 1,填充1， 个数 64
+            # 输出 （224 - 3 + 2 * 1）/ 1 + 1 = 224 （224 * 224 * 64）
+            # 归一化BN
+            # relu处理
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            # maxpool - 1 
+            # kernel_size = 2, 步长2
+            # （224 * 224 * 64）=> )(112, 112, 64)
+            nn.MaxPool2d(kernel_size=2, stride=2)
             )
-        # 第二层卷积
-        # 输入（27 * 27 * 96）分层两组在两个CPU中计算
-        # （27 * 27 * 48）卷积（5 * 5 * 48）步长：1, 填充：2， 每组个数128
-        # 输出（27 - 5 + 2 * 2）/1 + 1 = 27 （27 * 27 * 128）
-        # 经过relu2处理，生成激活像素
-        # 第二层池化
-        # 尺度 （3 * 3），步长2
-        # 输出（27 - 3）/2 + 1 = 13 (13 * 13 * 128)
-        # 归一化（local_size:5 * 5）
+
         self.layer2 = nn.Sequential(
-            nn.Conv2d(96, 256, kernel_size=5, stride=1, padding=2),
+            # 112 * 112 * 64 => 112 * 112 * 128
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3,stride=2),
-            nn.BatchNorm2d(256)
+            # conv 2 -2
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            # maxpool (112 * 112 * 128) => (56 * 56 *128)
+            nn.MaxPool2d(kernel_size=2, stride=2)
             )
-        # 第三次卷积
-        # 输入（13 * 13 * 128）卷积（3 * 3 * 128）,步长：1，填充1，个数192
-        # 输出（13 - 3 + 2*1）/1 + 1 = 13 (13 * 13 * 192)
-        # relu3处理
         self.layer3 = nn.Sequential(
-            nn.Conv2d(256,384, kernel_size=3, stride=1, padding=1),
-            nn.ReLU())
-        # 第四次卷积
-        # 输入（13 * 13 * 192）卷积（3 * 3 * 192）,步长：1，填充1，个数192
-        # 输出（13 - 3 + 2*1）/1 + 1 = 13 (13 * 13 * 192)
-        # relu4处理
-        self.layer4 = nn.Sequential(
-            nn.Conv2d(384, 384,kernel_size=3, stride=1, padding=1),
-            nn.ReLU())
-        # 第五次卷积
-        # 输入 13 * 13 * 192）卷积（3 * 3 * 192）,步长：1，填充1，个数128
-        # 输出（13 - 3 + 2*1）/1 + 1 = 13 (13 * 13 * 128)
-        # relu5处理
-        # 池化层
-        # 尺度（3 * 3），步长2
-        # （13 - 3）/ 2 +1 =6 (6 * 6 * 128)
-        self.layer5 = nn.Sequential(
-            nn.Conv2d(384, 256, kernel_size=3, stride=1, padding=1),
+            # (56 * 56 * 128) = (56 * 56 * 256)
+            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=3, stride=2))
+            # conv 3-2
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            # conv 3-3
+            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            # max_pool (56 * 56 *256 => 28 * 28 * 256)
+            nn.MaxPool2d(kernel_size=2, stride=2)
+            )
+        self.layer4 = nn.Sequential(
+            # (28 * 28 * 256) = (28 * 28 * 512)
+            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            # conv 4-2
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            # conv 4 -3        
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            # max_pool (28 * 28 * 512 => 14 * 14 * 512)
+            nn.MaxPool2d(kernel_size=2, stride=2)
+            )
+        self.layer5 = nn.Sequential(
+            # (14 * 14 * 512) => (14 * 14 * 512)
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            # conv 5-2
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            # conv 5-3        
+            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            # max_pool (14 * 14 * 512 => 7 * 7 * 512)
+            nn.MaxPool2d(kernel_size=2, stride=2)
+            )
+        
+        self.layer6 = nn.Sequential(
+            nn.Linear(7 * 7 * 512, 4096),
+            nn.BatchNorm1d(4096),
+            nn.ReLU())
+        self.layer7 = nn.Sequential(
+            nn.Linear(4096, 4096),
+            nn.BatchNorm1d(4096),
+            nn.ReLU())
+        self.layer8 = nn.Sequential(
+            nn.Linear(4096, num_classes),
+            nn.BatchNorm1d(num_classes),
+            nn.Softmax())
 
-        # 第五层数据合并
-        # 输入（6 * 6 * 256），卷积（6 * 6 * 256），步长1，个数4096
-        # 输出 （6 - 6）/ 1 + 1 = 1 (4096个神经元)
-        # relu6处理
-        # drop6处理
-        self.fc_1 = nn.Linear(6 * 6 * 256, 4096)
-        self.dropout_1 =  nn.Dropout(p=0.5)
-
-        # 全连接层
-        # 输入 4096 (4096个神经元)
-        # relu7
-        # drop7
-        self.fc_2 = nn.Linear(4096, 4096)
-        self.dropout_2 = nn.Dropout(0.6)
-
-        # 全连接层
-        # 输入 4096 （1000个神经元）
-        # 输出训练值
-        self.fc_3=  nn.Linear(4096, num_classes)
 
     def forward(self, x):
         out = self.layer1(x)
@@ -118,83 +134,15 @@ class AlexNet(nn.Module):
         out = self.layer4(out)
         out = self.layer5(out)
         out = out.reshape(out.size(0), -1)
-
-        out = self.fc_1(out)
-        out = F.relu(out)
-        out = self.dropout_1(out)
-
-        out = self.fc_2(out)
-        out = F.relu(out)
-        out = self.dropout_2(out)
-
-        out = self.fc_3(out)
-        out = F.softmax(out)
+        out = self.layer6(out)
+        out = self.layer7(out)
+        out = self.layer8(out)
         return out 
 
-# alex_net = AlexNet()
-"""
-# 用一个均值为0、标准差为0.01的高斯分布初始化了每一层的权重
-def weight_init(m):
-    classname = m.__class__.__name__
-    if classname.find("Conv") != -1:
-        m.weight.data.normal_(0, 0.01)
-    if classname.find("BatchNorm") != -1:
-        m.weight.data.normal_(1.0,.0.01)
-        m.bias.data.fill_(0)
+# vgg16 = VGG16_Net()
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = AlexNet().to(device)
-model.apply(weight_init)
+class vgg16net_model(object):
 
-criterion = nn.CrossEntropyLoss()
-# 当验证误差率在当前学习率下不再提高时，就将学习率除以10。
-learning_rate = 0.01
-# 动力0.8，权重衰减为5e-5
-# eps = 1e-8, weight_decay=5e-5
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, eps=1e-08, weight_decay=5e-05)
-
-# Trian the model
-total_steps = len(train_loader)
-num_epochs = 1
-for epoch in range(num_epochs):
-    for i,(images, labels) in enumerate(train_loader):
-        images = images.to(device)
-        labels = labels.to(device)
-
-        outputs = model(images)
-        loss = criterion(outputs, labels)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-
-        if (i + 1) % 100 == 0:
-            print('Epoch:[{}/{}],Step:[{}/{}],Loss:{:.4f}'.format(epoch+1, num_epochs, step, total_steps, loss))
-
-
-# test the model
-model.eval()
-# eval()时，框架会自动把BN和DropOut固定住，不会取平均，而是用训练好的值
-
-with torch.no_grad():
-    correct = 0
-    total = 0
-    for i, (images, labels) in enumerate(test_loader):
-        images = images.to(device)
-        labels = labels.to(device)
-
-        predict_labels = model(images)
-
-        _, predicted = torch.max(predict_labels, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-        print("Accuracy of the model on 100 test images is{}%".format(correct / total * 100))
-
-# save the model
-torch.save(model.state_dict(), 'AlexNet_model.ckpt')
-"""
-
-class alexnet_model(object):
     def __init__(self, dataset_path, save_model_path, save_history_path, epochs, batchsize, device, mode):
         """
         dataset_path:'./data/train_data'
@@ -207,17 +155,19 @@ class alexnet_model(object):
         self.dataset_path = dataset_path
         self.save_model_path = save_model_path
         self.save_history_path = save_history_path
-        self.epochs = epochs
-        self.batch_size = batchsize
+#         self.epochs = epochs
+        self.epochs = 10
+#         self.batch_size = batch_size
+        self.batch_size = 20
         self.mode = mode
-        self.learning_rate = 0.0001
+        self.learning_rate = 0.0002
         self.num_classes = 10
         if device == "cuda" and torch.cuda.is_available():
             self.device = torch.device("cuda:1")
         else:
             self.device = torch.device("cpu")
         self.criterion = nn.CrossEntropyLoss().to(self.device)
-        self.train_data, self.test_data = load_data(self.dataset_path, net_name="alexnet")
+        self.train_data, self.test_data = load_data(self.dataset_path, net_name="vgg16net")
 
         self.train_loader = torch.utils.data.DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = torch.utils.data.DataLoader(self.test_data, batch_size=self.batch_size, shuffle=False)
@@ -229,21 +179,21 @@ class alexnet_model(object):
         self.val_loss_history = []
         self.train_accuracy_history = []
         self.val_accuracy_history = []
-        self.cur_model_name = os.path.join(self.save_model_path, 'current_alex_net.t7')
-        self.best_model_name = os.path.join(self.save_model_path, 'best_alex_net.t7')
+        self.cur_model_name = os.path.join(self.save_model_path, 'current_vgg16_net.t7')
+        self.best_model_name = os.path.join(self.save_model_path, 'best_vgg16_net.t7')
         self.max_loss = 0
         self.min_loss = float("inf")
         
-    def adjust_learning_rate(self, epoch, optimizer):
-        """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-        self.learning_rate *= (0.1 ** (epoch // 30))
-        for param_group in optimizer.param_groups:
-            param_group['lr'] = self.learning_rate
+    # def adjust_learning_rate(self, epoch, optimizer):
+    #     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+    #     self.learning_rate *= (0.1 ** (epoch // 30))
+    #     for param_group in optimizer.param_groups:
+    #         param_group['lr'] = self.learning_rate
 
     def train(self):
         
-        alex_net = AlexNet(self.num_classes).to(self.device)
-        optimizer = Adam(alex_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
+        vgg16_net = VGG16_Net(self.num_classes).to(self.device)
+        optimizer = Adam(vgg16_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
         step = 0
         for epoch in range(self.epochs):
             
@@ -262,7 +212,7 @@ class alexnet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # compute output
-                outputs = alex_net(images)
+                outputs = vgg16_net(images)
                 train_loss = self.criterion(outputs, labels)
 
                 # compute accuracy
@@ -274,7 +224,7 @@ class alexnet_model(object):
                 optimizer.zero_grad()
                 train_loss.backward()
                 optimizer.step()
-            print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
+                print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
 
                 #show result and save model 
                 # step = epochs * (50000 // batch_size) = 100 * 50000 // 100 = 50000
@@ -288,7 +238,7 @@ class alexnet_model(object):
             self.train_accuracy_history.append(train_accuracy)
             
             # 保存当前模型
-            torch.save(alex_net, self.cur_model_name)
+            torch.save(vgg16_net, self.cur_model_name)
             
             # 计算当前模型在测试集上的准确率的准确率
             val_accuracy = self.validate()
@@ -305,9 +255,9 @@ class alexnet_model(object):
         self.plot_curve()
 
     def validate(self):
-        alex_net = torch.load(self.cur_model_name).to(self.device)
+        vgg16_net = torch.load(self.cur_model_name).to(self.device)
         # Test model
-        alex_net.eval()
+        vgg16_net.eval()
 
         # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
         with torch.no_grad():
@@ -318,7 +268,7 @@ class alexnet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = alex_net(images)
+                outputs = vgg16_net(images)
                 val_loss = self.criterion(outputs, labels)
                 # print(outputs.data.shape, type(outputs.data))
                 # print(outputs.shape, type(outputs))
@@ -331,6 +281,27 @@ class alexnet_model(object):
             self.max_loss = max(self.max_loss, val_loss)
             self.min_loss = min(self.min_loss, val_loss)
         return val_accuracy
+    
+    def test(self):
+        vgg16_net = torch.load(self.best_model_name).to(self.device)
+        # Test model
+        vgg16_net.eval()
+
+        # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for i, (images, labels) in enumerate(self.test_loader):
+                #  reshape images to (batch, input_size)
+                images = images.to(self.device)
+                labels = labels.to(self.device)
+                # forward pass
+                outputs = vgg16_net(images)
+                
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+            print("current accuracy in each batch size is {}".format(100 * correct / total ))
 
     def plot_curve(self): 
 
