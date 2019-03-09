@@ -109,7 +109,7 @@ class AlexNet(nn.Module):
         # 全连接层
         # 输入 4096 （1000个神经元）
         # 输出训练值
-        self.fc_3=  nn.Linear(4096, num_classes)
+        self.fc_3 = nn.Linear(4096, num_classes)
 
     def forward(self, x):
         out = self.layer1(x)
@@ -207,8 +207,10 @@ class alexnet_model(object):
         self.dataset_path = dataset_path
         self.save_model_path = save_model_path
         self.save_history_path = save_history_path
-        self.epochs = epochs
-        self.batch_size = batchsize
+#         self.epochs = epochs
+        self.epochs = 100
+#         self.batch_size = batchsize
+        self.batch_size = 100
         self.mode = mode
         self.learning_rate = 0.0001
         self.num_classes = 10
@@ -325,12 +327,35 @@ class alexnet_model(object):
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+                print("current accuracy in each batch size is {}".format(100 * correct / total ))
             val_accuracy = 100 * correct / total 
             self.val_loss_history.append(val_loss)
             self.max_loss = max(self.max_loss, val_loss)
             self.min_loss = min(self.min_loss, val_loss)
         return val_accuracy
+       
+    def test(self):
+        alex_net = torch.load(self.best_model_name).to(self.device)
+        # Test model
+        alex_net.eval()
+
+        # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for i, (images, labels) in enumerate(self.test_loader):
+                #  reshape images to (batch, input_size)
+                images = images.to(self.device)
+                
+                labels = labels.to(self.device)
+                # forward pass
+                outputs = alex_net(images)
+                
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+                print("current accuracy in each batch size is {}".format(100 * correct / total ))
+
 
     def plot_curve(self): 
 
@@ -365,13 +390,13 @@ class alexnet_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle='-', label='valid_accuracy', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
-        fig_name = self.save_history_path + "/accuracy_history"
+        fig_name = self.save_history_path + "/alexnet_accuracy_history"
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save accuracy history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
         
         
-        title = 'the accuracy curve of train/validate'
+        title = 'the loss history curve of train/validate'
         fig = plt.figure(figsize=figsize)
         
         x_axis = np.array([i for i in range(self.epochs)]) # epochs
@@ -380,7 +405,7 @@ class alexnet_model(object):
         plt.xlim(0, self.epochs)
         plt.ylim(self.min_loss, self.max_loss)
         interval_y = (self.max_loss - self.min_loss) / 20
-        print(interval_y)
+#         print(interval_y)
         interval_x = 5
         plt.xticks(np.arange(0, self.epochs + interval_x, interval_x))
         plt.yticks(np.arange(max(0,self.min_loss - 5 * interval_y), self.max_loss + 2 * interval_y, interval_y))
@@ -397,7 +422,7 @@ class alexnet_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle=':', label='val_loss', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
         
-        fig_name = self.save_history_path + "/loss_history"
+        fig_name = self.save_history_path + "/alexnet_loss_history"
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)

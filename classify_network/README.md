@@ -12,7 +12,7 @@ check_folder:文件夹不存在则创建文件夹
 ## main.py
 传入要网络名称和模式，  
 如：python main.py --model alexnet --mode train为训练alexnet。  
-python main.py --model alexnet --mode test 为测试alex网络的性能。
+python main.py --model alexnet --mode test 为测试最佳alex网络的性能。
  
 ## model文件夹
 包含各种分类网络
@@ -44,6 +44,9 @@ resnet升级版，当前层和之间的每一层都有连接，这里是concatna
 引入inception机制，1x1卷积，(1x1 + 3x3卷积), （1x1 + 5x5卷积）,(3x3 maxpool + 1x1 conv),stride都为1，out_channel自定义，最后concat。有多余两个aux_classifer，用来回传梯度。  
 训练：python main.py --model googlenet --mode train    
 测试：python main.py --model googlenet --mode test
+### senet
+对通道加权
+
 
 ## model
 对于每个model，先定义它的网络层结构，然后定义一个类实现，类中会有_train,_test方法，用于模型的训练和测试。

@@ -11,137 +11,148 @@ from data_utils import load_data
 import os
 import shutil
 import numpy as np
+import math
 
-"""
-VGG 的优点在于，堆叠多个小的卷积核而不使用池化操作可以增加网络的表征深度，同时限制参数的数量。
-例如，通过堆叠 3 个 3×3 卷积层而不是使用单个的 7×7 层，可以克服一些限制。
-首先，这样做组合了三个非线性函数，而不只是一个，使得决策函数更有判别力和表征能力。
-第二，参数量减少了 81%，而感受野保持不变。
-另外，小卷积核的使用也扮演了正则化器的角色，并提高了不同卷积核的有效性。
+# 卷积层的参数数量取决于卷积核大小k，输入通道数量x， 输出通道数y
+# 瓶颈块通过一个确定的比例r采用代价小的1*1卷积来减少通道数，以便后面的3*3卷积具有较少的通道数，
+# 最后使用1*1卷积还原通道数
 
-VGG 的缺点在于，其评估的开销比浅层网络更加昂贵，内存和参数（140M）也更多。
-这些参数的大部分都可以归因于第一个全连接层。
-结果表明，这些层可以在不降低性能的情况下移除，同时显著减少了必要参数的数量。
-"""
+# 瓶颈块
+class BottleneckBlock(nn.Module):
+    expansion = 4
 
-class VGG16_Net(nn.Module):
-    def __init__(self, num_classes):
-        super(VGG16_Net, self).__init__()
-
+    def __init__(self, in_channel, out_channel, stride=1, downsample=None):
+        # 当 in_channel = out_channel 时，立刻可以直接相加
+        super(BottleneckBlock, self).__init__()
+        # 1 * 1 卷积 缩小想输出的维度
+        # 这里的out_channel为输出的out_channel 的1/4
         self.layer1 = nn.Sequential(
-            # 核心思想用小卷积核代替大卷积核，减少参数
-            # 卷积 1-1
-            # 输入 （224 * 224 * 3） 卷积（3 * 3 * 3）步长 1,填充1， 个数 64
-            # 输出 （224 - 3 + 2 * 1）/ 1 + 1 = 224 （224 * 224 * 64）
-            # 归一化BN
-            # relu处理 （relu提高训练速度）
-            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            # 卷积 1-2
-            # 输入 （224 * 224 * 64） 卷积（3 * 3 * 3）步长 1,填充1， 个数 64
-            # 输出 （224 - 3 + 2 * 1）/ 1 + 1 = 224 （224 * 224 * 64）
-            # 归一化BN
-            # relu处理
-            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            # maxpool - 1 
-            # kernel_size = 2, 步长2
-            # （224 * 224 * 64）=> )(112, 112, 64)
-            nn.MaxPool2d(kernel_size=2, stride=2)
-            )
-
-        self.layer2 = nn.Sequential(
-            # 112 * 112 * 64 => 112 * 112 * 128
-            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            # conv 2 -2
-            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            # maxpool (112 * 112 * 128) => (56 * 56 *128)
-            nn.MaxPool2d(kernel_size=2, stride=2)
-            )
-        self.layer3 = nn.Sequential(
-            # (56 * 56 * 128) = (56 * 56 * 256)
-            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            # conv 3-2
-            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            # conv 3-3
-            nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            # max_pool (56 * 56 *256 => 28 * 28 * 256)
-            nn.MaxPool2d(kernel_size=2, stride=2)
-            )
-        self.layer4 = nn.Sequential(
-            # (28 * 28 * 256) = (28 * 28 * 512)
-            nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            # conv 4-2
-            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            # conv 4 -3        
-            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            # max_pool (28 * 28 * 512 => 14 * 14 * 512)
-            nn.MaxPool2d(kernel_size=2, stride=2)
-            )
-        self.layer5 = nn.Sequential(
-            # (14 * 14 * 512) => (14 * 14 * 512)
-            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            # conv 5-2
-            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            # conv 5-3        
-            nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(512),
-            nn.ReLU(),
-            # max_pool (14 * 14 * 512 => 7 * 7 * 512)
-            nn.MaxPool2d(kernel_size=2, stride=2)
-            )
+            nn.Conv2d(in_channel, out_channel // self.expansion, kernel_size=1),
+            nn.BatchNorm2d(out_channel // self.expansion))
         
-        self.layer6 = nn.Sequential(
-            nn.Linear(7 * 7 * 512, 4096),
-            nn.BatchNorm1d(4096),
-            nn.ReLU())
-        self.layer7 = nn.Sequential(
-            nn.Linear(4096, 4096),
-            nn.BatchNorm1d(4096),
-            nn.ReLU())
-        self.layer8 = nn.Sequential(
-            nn.Linear(4096, num_classes),
-            nn.BatchNorm1d(num_classes),
-            nn.Softmax())
+        self.relu = nn.ReLU(inplace=True)
 
+        # 特征图可能大小的改变发生在这里
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(out_channel // self.expansion, out_channel // self.expansion, kernel_size=3, stride=stride, padding=1),
+            nn.BatchNorm2d(out_channel // self.expansion))
+
+        # 1 * 1 、卷积还原通道数
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(out_channel // self.expansion, out_channel, kernel_size=1),
+            nn.BatchNorm2d(out_channel)
+            )
+
+        self.downsample = downsample
+        self.stride = stride
+
+    def forward(self,x):
+        residual = x 
+
+        out = self.layer1(x)
+        out = self.relu(out)
+        out = self.layer2(out)
+        out = self.relu(out)
+        out = self.layer3(out)
+        out = self.relu(out)
+
+        if self.downsample is not None:
+            residual = self.downsample(x)
+
+        out = out + residual
+        out = self.relu(out)
+        return out 
+
+class ResnetBottleneck(nn.Module):
+    def __init__(self, block, layers, num_classes=1000):
+        # 输入 224 * 224 * 3
+        super(ResnetBottleneck,self).__init__()
+
+        self.in_channel = 64
+
+        self.layer0 = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            # (224 - 7 + 3 * 2) // 2 + 1 = 112.5
+            # 舍弃 ？
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+            # (112 - 3 + 2 * 1)// 2 + 1 = 57?
+            # 56 * 56 * 64
+            )
+
+        # 传入瓶颈块走一下流程
+        # 传入需要重复的基础块， 传入需要输出的通道数， 传入基础块需要循环的次数
+        self.layer1 = self._make_layer(block, 64, layers[0])
+        # 第一次 x = 56 * 56 * 64, layers[0] = 3
+        # f(x) => (56 - 3 + 2 * 1)/ 1 + 1 = 56 (卷积两次形状不变)， out_channel = 64
+        # 输出 56 * 56 * 64 
+
+        # 也就是说，特征图的长宽大小由stride决定，通道数由out_channel决定
+        self.layer2 = self._make_layer(block, 128, layers[1], stride = 2)
+        # 输出 (56 - 3 + 2 * 1)// 2 + 1= 28 out_channel = 128
+        # 输出 28 * 28 * 128
+        self.layer3 = self._make_layer(block, 256, layers[2], stride = 2)
+        # 输出 14 * 14 * 256
+        self.layer4 = self._make_layer(block, 512, layers[3], stride = 2)
+        # 输出 7 * 7 * 512
+
+        self.avgpool = nn.AvgPool2d(7)
+        # 输出512
+        self.fc = nn.Sequential(
+            nn.Linear(512, num_classes),
+            nn.BatchNorm1d(num_classes),
+            nn.Softmax()
+            ) 
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            if isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def _make_layer(self, block, out_channel, blocks, stride=1):
+        # channel 需要输出的通道数，blocks 需要叠加几次block
+        downsample = None
+        if stride != 1 or self.in_channel != out_channel:
+            # 第一次：stride = 1， self.in_channel = 64, out_channel= 64
+            # 第二次: stride = 2, self.in_channel = 64, out_channel= 128
+            downsample = nn.Sequential(
+                nn.Conv2d(self.in_channel, out_channel, 
+                    kernel_size=1, stride=stride),
+                nn.BatchNorm2d(out_channel)
+                )
+        layers = []
+
+        layers.append(block(self.in_channel, out_channel, stride, downsample))
+        
+        # BottleneckBlock这里展宽为4
+        self.in_channel = out_channel
+        # 第一次 64
+        # 第二次 128
+
+        for i in range(1, blocks):
+            layers.append(block(self.in_channel, out_channel))
+            # 第一次 block(64 , 64)
+            # 第二次 block(128, 128)
+
+        return nn.Sequential(*layers)
 
     def forward(self, x):
-        out = self.layer1(x)
+        out = self.layer0(x)
+        out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
-        out = self.layer5(out)
+        out = self.avgpool(out)
         out = out.reshape(out.size(0), -1)
-        out = self.layer6(out)
-        out = self.layer7(out)
-        out = self.layer8(out)
+        out = self.fc(out)
+
         return out 
 
-# vgg16 = VGG16_Net()
-
-class vgg16net_model(object):
+class resnet_bottleneck_model(object):
 
     def __init__(self, dataset_path, save_model_path, save_history_path, epochs, batchsize, device, mode):
         """
@@ -167,7 +178,7 @@ class vgg16net_model(object):
         else:
             self.device = torch.device("cpu")
         self.criterion = nn.CrossEntropyLoss().to(self.device)
-        self.train_data, self.test_data = load_data(self.dataset_path, net_name="vgg16net")
+        self.train_data, self.test_data = load_data(self.dataset_path, net_name="resnet_bottleneck")
 
         self.train_loader = torch.utils.data.DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = torch.utils.data.DataLoader(self.test_data, batch_size=self.batch_size, shuffle=False)
@@ -179,8 +190,8 @@ class vgg16net_model(object):
         self.val_loss_history = []
         self.train_accuracy_history = []
         self.val_accuracy_history = []
-        self.cur_model_name = os.path.join(self.save_model_path, 'current_vgg16_net.t7')
-        self.best_model_name = os.path.join(self.save_model_path, 'best_vgg16_net.t7')
+        self.cur_model_name = os.path.join(self.save_model_path, 'current_resnet_bottleneck_net.t7')
+        self.best_model_name = os.path.join(self.save_model_path, 'best_resnet_bottleneck_net.t7')
         self.max_loss = 0
         self.min_loss = float("inf")
         
@@ -191,14 +202,8 @@ class vgg16net_model(object):
     #         param_group['lr'] = self.learning_rate
 
     def train(self):
-        vgg16_net = torch.load(self.current_model_name).to(self.device) 
-        
-        if vgg16_net is not None:
-            print("continue train the last model")
-        else:
-            vgg16_net = VGG16_Net(self.num_classes).to(self.device)
-
-        optimizer = Adam(vgg16_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
+        resnet_bottleneck = ResnetBottleneck(BottleneckBlock, layers=[3, 4, 6, 3], num_classes=self.num_classes).to(self.device)
+        optimizer = Adam(resnet_bottleneck.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
         step = 0
         for epoch in range(self.epochs):
             
@@ -217,7 +222,7 @@ class vgg16net_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # compute output
-                outputs = vgg16_net(images)
+                outputs = resnet_bottleneck(images)
                 train_loss = self.criterion(outputs, labels)
 
                 # compute accuracy
@@ -243,7 +248,7 @@ class vgg16net_model(object):
             self.train_accuracy_history.append(train_accuracy)
             
             # 保存当前模型
-            torch.save(vgg16_net, self.cur_model_name)
+            torch.save(resnet_bottleneck, self.cur_model_name)
             
             # 计算当前模型在测试集上的准确率的准确率
             val_accuracy = self.validate()
@@ -260,9 +265,9 @@ class vgg16net_model(object):
         self.plot_curve()
 
     def validate(self):
-        vgg16_net = torch.load(self.cur_model_name).to(self.device)
+        resnet_bottleneck = torch.load(self.cur_model_name).to(self.device)
         # Test model
-        vgg16_net.eval()
+        resnet_bottleneck.eval()
 
         # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
         with torch.no_grad():
@@ -273,7 +278,7 @@ class vgg16net_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = vgg16_net(images)
+                outputs = resnet_bottleneck(images)
                 val_loss = self.criterion(outputs, labels)
                 # print(outputs.data.shape, type(outputs.data))
                 # print(outputs.shape, type(outputs))
@@ -288,9 +293,9 @@ class vgg16net_model(object):
         return val_accuracy
     
     def test(self):
-        vgg16_net = torch.load(self.best_model_name).to(self.device)
+        resnet_bottleneck = torch.load(self.best_model_name).to(self.device)
         # Test model
-        vgg16_net.eval()
+        resnet_bottleneck.eval()
 
         # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
         with torch.no_grad():
@@ -301,7 +306,7 @@ class vgg16net_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = vgg16_net(images)
+                outputs = resnet_bottleneck(images)
                 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
@@ -341,13 +346,13 @@ class vgg16net_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle='-', label='valid_accuracy', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
-        fig_name = self.save_history_path + "/vgg16_accuracy_history"
+        fig_name = self.save_history_path + "/resnet_bottle_accuracy_history"
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save accuracy history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
         
         
-        title = 'the loss history curve of train/validate'
+        title = 'the loss curve of train/validate'
         fig = plt.figure(figsize=figsize)
         
         x_axis = np.array([i for i in range(self.epochs)]) # epochs
@@ -372,10 +377,7 @@ class vgg16net_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle=':', label='val_loss', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
         
-        fig_name = self.save_history_path + "/vgg16_loss_history"
+        fig_name = self.save_history_path + "/resnet_bottleneck_loss_history"
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
-
-    def continue_train(self):
-        
