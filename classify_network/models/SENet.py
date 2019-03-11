@@ -13,30 +13,59 @@ import shutil
 import numpy as np
 import math
 
+# 使用 Squeeze and Excitation块，这个块提出每个通道的重要性，并对他们进行加权
 
-# ResNet作者指出，增加网络深度会导致更高的训练误差，
-# 这表明梯度问题（梯度消失/爆炸）可能会导致训练收敛性等潜在问题。
-# ResNet 的主要贡献是增加了神经网络架构的跳过连接（skip connection），使用批归一化并移除了作为最后一层的全连接层。
+# 输入的是一个已经卷积过的块
+class SEModule(nn.Module):
+    def __init__(self, in_channel, reduction):
+        super(SEModule, self).__init__()
 
-# 除了跳过链接，每次卷积完成之后，激活进行之前都采取了批归一化
-# 最后，网络删除了全连接层，并使用平均池化层减少参数的数量。
-# 网络加深，卷积层的抽象能力变强，从而减少了对全连接层的需求。
-
-# 基础残差块
-class ResNetBasicBlock(nn.Module):
-    def __init__(self, in_channel, out_channel, stride=1, downsample=None):
-        super(ResNetBasicBlock, self).__init__()
+        self.avgpool = nn.AdaptiveAvgPool2d(1) # 1 * 1 * in_channel
 
         self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channel, out_channel, kernel_size=3, stride=stride, padding=1),
-            nn.BatchNorm2d(out_channel))
+            nn.Conv2d(in_channel, in_channel // reduction, kernel_size=1),
+            # 1 * 1 * in_channel//reduction 减少参数
+            nn.BatchNorm2d(in_channel // reduction),
+            nn.ReLU()
+            )
+        self.layer2 = nn.Sequential(
+            nn.Conv2d(in_channel // reduction, in_channel, kernel_size=1), # 1 * 1 * in_channel
+            nn.Sigmoid(),
+            )
+
+    def forward(self, x):
+        module_input = x
+        out = self.avgpool(x)
+        out = self.layer1(out)
+        out = self.layer2(out)
+        return module_input * out
+
+class SEBottleneckBlock(nn.Module):
+    expansion = 4
+
+    def __init__(self, in_channel, out_channel, stride=1, downsample=None, reduction=16):
+        # 当 in_channel = out_channel 时，立刻可以直接相加
+        super(SEBottleneckBlock, self).__init__()
+        # 1 * 1 卷积 缩小想输出的维度
+        # 这里的out_channel为输出的out_channel 的1/4
+        self.layer1 = nn.Sequential(
+            nn.Conv2d(in_channel, out_channel // self.expansion, kernel_size=1),
+            nn.BatchNorm2d(out_channel // self.expansion))
         
         self.relu = nn.ReLU(inplace=True)
 
+        # 特征图可能大小的改变发生在这里
         self.layer2 = nn.Sequential(
-            nn.Conv2d(out_channel, out_channel, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(out_channel))
+            nn.Conv2d(out_channel // self.expansion, out_channel // self.expansion, kernel_size=3, stride=stride, padding=1),
+            nn.BatchNorm2d(out_channel // self.expansion))
 
+        # 1 * 1 、卷积还原通道数
+        self.layer3 = nn.Sequential(
+            nn.Conv2d(out_channel // self.expansion, out_channel, kernel_size=1),
+            nn.BatchNorm2d(out_channel)
+            )
+
+        self.se_module = SEModule(out_channel, reduction=reduction)
         self.downsample = downsample
         self.stride = stride
 
@@ -46,25 +75,31 @@ class ResNetBasicBlock(nn.Module):
         out = self.layer1(x)
         out = self.relu(out)
         out = self.layer2(out)
+        out = self.relu(out)
+        out = self.layer3(out)
+        out = self.relu(out)
+
+        out = self.se_module(out)
 
         if self.downsample is not None:
             residual = self.downsample(x)
 
-        out += residual
+        out = out + residual
         out = self.relu(out)
         return out 
 
-class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes=1000):
-        # 输入 32 * 32 * 3
-        super(ResNet,self).__init__()
-        # 首先找到ResNet的父类（比如是类nn.Module），然后把类ResNet的对象self转换为类nn.Module的对象，
-        # 然后“被转换”的类nn.Module对象调用自己的__init__函数
+class SENet(nn.Module):
+    def __init__(self, block, layers, num_classes=10, reduction=16):
+
+        # 输入 224 * 224 * 3
+        super(SENet,self).__init__()
+
         self.in_channel = 64
 
         self.layer0 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
-            # (224 - 7 + 3 * 2) // 2 + 1 = 112
+            # (224 - 7 + 3 * 2) // 2 + 1 = 112.5
+            # 舍弃 ？
             nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
@@ -72,25 +107,28 @@ class ResNet(nn.Module):
             # 56 * 56 * 64
             )
 
+        # 传入瓶颈块走一下流程
         # 传入需要重复的基础块， 传入需要输出的通道数， 传入基础块需要循环的次数
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        # 第一次 x = 56 * 56 * 64
+        self.layer1 = self._make_layer(block, 64, layers[0], reduction=reduction)
+        # 第一次 x = 56 * 56 * 64, layers[0] = 3
         # f(x) => (56 - 3 + 2 * 1)/ 1 + 1 = 56 (卷积两次形状不变)， out_channel = 64
-        # 输出 56 * 56 * 64
-        self.layer2 = self._make_layer(block, 128, layers[1], stride = 2)
-        # 输出 (56 - 3 + 2 * 1)// 2 + 1= 28
+        # 输出 56 * 56 * 64 
+
+        # 也就是说，特征图的长宽大小由stride决定，通道数由out_channel决定
+        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, reduction=reduction)
+        # 输出 (56 - 3 + 2 * 1)// 2 + 1= 28 out_channel = 128
         # 输出 28 * 28 * 128
-        self.layer3 = self._make_layer(block, 256, layers[2], stride = 2)
+        self.layer3 = self._make_layer(block, 256, layers[2], stride=2, reduction=reduction)
         # 输出 14 * 14 * 256
-        self.layer4 = self._make_layer(block, 512, layers[3], stride = 2)
+        self.layer4 = self._make_layer(block, 512, layers[3], stride=2, reduction=reduction)
         # 输出 7 * 7 * 512
 
         self.avgpool = nn.AvgPool2d(7)
         # 输出512
         self.fc = nn.Sequential(
-            nn.Linear(512,num_classes),
-            nn.BatchNorm1d(num_classes),
-            nn.Softmax()
+            nn.Linear(512, num_classes),
+            nn.BatchNorm1d(num_classes)
+#             nn.ReLU()
             ) 
 
         for m in self.modules():
@@ -101,19 +139,23 @@ class ResNet(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-    def _make_layer(self, block, out_channel, blocks, stride=1):
-        # out_channel 需要输出的通道数，blocks 需要叠加几次block
+    def _make_layer(self, block, out_channel, blocks, stride=1, reduction=16):
+        # channel 需要输出的通道数，blocks 需要叠加几次block
         downsample = None
         if stride != 1 or self.in_channel != out_channel:
             downsample = nn.Sequential(
-                nn.Conv2d(self.in_channel, out_channel, kernel_size=1, stride=stride),
+                nn.Conv2d(self.in_channel, out_channel, 
+                    kernel_size=1, stride=stride),
                 nn.BatchNorm2d(out_channel)
                 )
         layers = []
-        layers.append(block(self.in_channel, out_channel, stride, downsample))
+
+        layers.append(block(self.in_channel, out_channel, stride, downsample, reduction))
+        
         self.in_channel = out_channel
+
         for i in range(1, blocks):
-            layers.append(block(self.in_channel, out_channel))
+            layers.append(block(self.in_channel, out_channel=out_channel, reduction=reduction))
 
         return nn.Sequential(*layers)
 
@@ -129,7 +171,7 @@ class ResNet(nn.Module):
 
         return out 
 
-class resnet_model(object):
+class senet_model(object):
 
     def __init__(self, dataset_path, save_model_path, save_history_path, epochs, batchsize, device, mode):
         """
@@ -140,6 +182,8 @@ class resnet_model(object):
         z_dim:100
         device: device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         """
+        self.model_name = 'senet'
+
         self.dataset_path = dataset_path
         self.save_model_path = save_model_path
         self.save_history_path = save_history_path
@@ -148,14 +192,15 @@ class resnet_model(object):
 #         self.batch_size = batch_size
         self.batch_size = 20
         self.mode = mode
-        self.learning_rate = 0.0002
+        self.learning_rate = 5e-3
         self.num_classes = 10
         if device == "cuda" and torch.cuda.is_available():
             self.device = torch.device("cuda:1")
         else:
             self.device = torch.device("cpu")
         self.criterion = nn.CrossEntropyLoss().to(self.device)
-        self.train_data, self.test_data = load_data(self.dataset_path, net_name="resnet")
+        
+        self.train_data, self.test_data = load_data(self.dataset_path, net_name=self.model_name)
 
         self.train_loader = torch.utils.data.DataLoader(self.train_data, batch_size=self.batch_size, shuffle=True)
         self.test_loader = torch.utils.data.DataLoader(self.test_data, batch_size=self.batch_size, shuffle=False)
@@ -167,8 +212,8 @@ class resnet_model(object):
         self.val_loss_history = []
         self.train_accuracy_history = []
         self.val_accuracy_history = []
-        self.cur_model_name = os.path.join(self.save_model_path, 'current_resnet.t7')
-        self.best_model_name = os.path.join(self.save_model_path, 'best_resnet.t7')
+        self.cur_model_name = os.path.join(self.save_model_path, 'current_{}.t7'.format(self.model_name))
+        self.best_model_name = os.path.join(self.save_model_path, 'best_{}.t7'.format(self.model_name))
         self.max_loss = 0
         self.min_loss = float("inf")
         
@@ -180,22 +225,24 @@ class resnet_model(object):
 
     def train(self):
         try:
-            resnet = torch.load(self.cur_model_name).to(self.device)
+            model = torch.load(self.cur_model_name).to(self.device)
             print("continue train the last model")
         except FileNotFoundError:
-            resnet = ResNet(ResNetBasicBlock, layers=[3, 4, 6, 3], num_classes=self.num_classes).to(self.device)
+            model = SENet(SEBottleneckBlock, layers=[3, 4, 6, 3], num_classes=self.num_classes, reduction=16).to(self.device)
         
-        optimizer = Adam(resnet.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
-        step = 0
+        optimizer = Adam(model.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=8e-4)
+        
+        
         for epoch in range(self.epochs):
             
 #             self.adjust_learing_rate(epoch, optimizer)
-            
+            scheduler.step()
             print("Main epoch:{}".format(epoch))
             # count the accuracy when train data
             correct = 0
             total = 0
-
+            step = 0
             for i, (images, labels) in enumerate(self.train_loader):
                 
                 # batch_size=100,所以step = 50000/100 = 500
@@ -204,7 +251,7 @@ class resnet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # compute output
-                outputs = resnet(images)
+                outputs = model(images)
                 train_loss = self.criterion(outputs, labels)
 
                 # compute accuracy
@@ -216,7 +263,8 @@ class resnet_model(object):
                 optimizer.zero_grad()
                 train_loss.backward()
                 optimizer.step()
-                print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
+                if step % 100 == 0:
+                    print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
 
                 #show result and save model 
                 # step = epochs * (50000 // batch_size) = 100 * 50000 // 100 = 50000
@@ -230,7 +278,7 @@ class resnet_model(object):
             self.train_accuracy_history.append(train_accuracy)
             
             # 保存当前模型
-            torch.save(resnet, self.cur_model_name)
+            torch.save(model, self.cur_model_name)
             
             # 计算当前模型在测试集上的准确率的准确率
             val_accuracy = self.validate()
@@ -244,12 +292,14 @@ class resnet_model(object):
        
         # 调用print_history将loss画出来并保存为图片
         # print_accarucy将在验证集上的准确率保存下来，存到图片里
+        self.min_loss = self.min_loss.item()
+        self.max_loss = self.max_loss.item()
         self.plot_curve()
 
     def validate(self):
-        resnet = torch.load(self.cur_model_name).to(self.device)
+        model = torch.load(self.cur_model_name).to(self.device)
         # Test model
-        resnet.eval()
+        model.eval()
 
         # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
         with torch.no_grad():
@@ -260,14 +310,14 @@ class resnet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = resnet(images)
+                outputs = model(images)
                 val_loss = self.criterion(outputs, labels)
                 # print(outputs.data.shape, type(outputs.data))
                 # print(outputs.shape, type(outputs))
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+            print("current accuracy in this epoch is {}".format(100 * correct / total ))
             val_accuracy = 100 * correct / total 
             self.val_loss_history.append(val_loss)
             self.max_loss = max(self.max_loss, val_loss)
@@ -275,9 +325,9 @@ class resnet_model(object):
         return val_accuracy
     
     def test(self):
-        resnet = torch.load(self.best_model_name).to(self.device)
+        model = torch.load(self.best_model_name).to(self.device)
         # Test model
-        resnet.eval()
+        model.eval()
 
         # eval mode (batchnorm uses moving mean/variance instead of mini-batch mean/variance)
         with torch.no_grad():
@@ -288,12 +338,12 @@ class resnet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = resnet(images)
+                outputs = model(images)
                 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+            print("current accuracy in this epoch is {}".format(100 * correct / total))
 
     def plot_curve(self): 
 
@@ -328,7 +378,7 @@ class resnet_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle='-', label='valid_accuracy', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
-        fig_name = self.save_history_path + "/resnet_accuracy_history"
+        fig_name = self.save_history_path + "{}_accuracy_history".format(self.model_name)
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save accuracy history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
@@ -359,7 +409,7 @@ class resnet_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle=':', label='val_loss', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
         
-        fig_name = self.save_history_path + "/resnet_loss_history"
+        fig_name = self.save_history_path + "{}_loss_history".format(self.model_name)
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)

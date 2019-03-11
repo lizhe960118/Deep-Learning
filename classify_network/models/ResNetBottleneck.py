@@ -202,7 +202,11 @@ class resnet_bottleneck_model(object):
     #         param_group['lr'] = self.learning_rate
 
     def train(self):
-        resnet_bottleneck = ResnetBottleneck(BottleneckBlock, layers=[3, 4, 6, 3], num_classes=self.num_classes).to(self.device)
+        try:
+            resnet_bottleneck = torch.load(self.cur_model_name).to(self.device)
+            print("continue train the last model")
+        except FileNotFoundError:
+            resnet_bottleneck = ResnetBottleneck(BottleneckBlock, layers=[3, 4, 6, 3], num_classes=self.num_classes).to(self.device)
         optimizer = Adam(resnet_bottleneck.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
         step = 0
         for epoch in range(self.epochs):

@@ -110,6 +110,14 @@ class AlexNet(nn.Module):
         # 输入 4096 （1000个神经元）
         # 输出训练值
         self.fc_3 = nn.Linear(4096, num_classes)
+        
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            if isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
 
     def forward(self, x):
         out = self.layer1(x)
@@ -243,8 +251,12 @@ class alexnet_model(object):
             param_group['lr'] = self.learning_rate
 
     def train(self):
-        
-        alex_net = AlexNet(self.num_classes).to(self.device)
+        try:
+            alex_net = torch.load(self.best_model_name).to(self.device) 
+            print("continue train the last model")
+        except FileNotFoundError:
+            alex_net = AlexNet(self.num_classes).to(self.device)
+            
         optimizer = Adam(alex_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
         step = 0
         for epoch in range(self.epochs):
@@ -426,3 +438,5 @@ class alexnet_model(object):
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
+        
+        

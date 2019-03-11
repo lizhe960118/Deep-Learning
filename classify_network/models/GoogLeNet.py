@@ -81,31 +81,33 @@ class inception_module(nn.Module):
         conv_3x3_out = self.conv_3x3(x)
         conv_5x5_out = self.conv_5x5(x)
         maxpool_3x3_out = self.maxpool_3x3(x)
-        out = torch.concat([conv_1x1_out, conv_3x3_out, conv_5x5_out, maxpool_3x3_out], 1)
+        out = torch.cat([conv_1x1_out, conv_3x3_out, conv_5x5_out, maxpool_3x3_out], 1)
         return out 
 
 class aux_classifier(nn.Module):
-    def __init__(self, in_channel, num_classes):
+    def __init__(self, in_channel,figure_size, num_classes):
         super(aux_classifier, self).__init__()
         # Average pooling, fc, dropout, fc
-        self.average_pool = nn.AvePool2d(kernel_size=3, stride=2, padding=1)
+        self.average_pool = nn.AvgPool2d(kernel_size=3, stride=2, padding=1)
         self.conv = nn.Conv2d(in_channel, 128, kernel_size=1, stride=1)
-        # self.fc_1 = nn.Linear(1024, 1024)
+        self.fc_1 = nn.Linear(figure_size * figure_size * 128 // 4, 1024)
         self.dropout = nn.Dropout(p=0.7)
         self.fc_2 = nn.Linear(1024, num_classes)
+        self.bn = nn.BatchNorm1d(num_classes)
+        self.softmax = nn.Softmax()
+        self.relu = nn.ReLU()
 
     def forward(self, x):
         out = self.average_pool(x)
         out = self.conv(out)
         out = out.reshape(out.size(0), -1)
-
-        self.fc_1 = nn.Linear(out.size(-1),1024)
-
         out = self.fc_1(out)
         out = F.relu(out)
         out = self.dropout(out)
         out = self.fc_2(out)
-        out = F.softmax(out)
+        out = self.bn(out)
+        
+#         out = self.softmax(out)
         return out 
 
 class GoogLeNet(nn.Module):
@@ -142,14 +144,15 @@ class GoogLeNet(nn.Module):
         # stage3 - 5 inception modules and max pooling
         self.stage_3_1 = inception_module(480, out_channels = [192, 96, 208, 16, 48, 64])
         # 8 * 8 * 512
-        self.stage_3_aux_1 = aux_classifier(512, num_classes)
+        self.stage_3_aux_1 = aux_classifier(512, figure_size = 8, num_classes = num_classes)
 
-        self.stage_3_2 = inception_module(512, out_channels = [160, 112, 225, 24, 64, 64])
+        self.stage_3_2 = inception_module(512, out_channels = [160, 112, 224, 24, 64, 64])
+        # 8 * 8 * 512
         self.stage_3_3 = inception_module(512, out_channels = [128, 128, 256, 24, 64, 64])
         # 8 * 8 * 512
-        self.stage_3_4 = inception_module(528, out_channels = [112, 144, 288, 32, 64, 64])
+        self.stage_3_4 = inception_module(512, out_channels = [112, 144, 288, 32, 64, 64])
         # 8 * 8 * 528
-        self.stage_3_aux_2 = aux_classifier(528, num_classes)
+        self.stage_3_aux_2 = aux_classifier(528,figure_size = 8, num_classes = num_classes)
 
         self.stage_3_5 = inception_module(528, out_channels = [256, 160, 320, 32, 128, 128])
         # 8 * 8 * 832
@@ -161,12 +164,26 @@ class GoogLeNet(nn.Module):
         # 4 * 4 * 832
         self.stage_4_2 = inception_module(832, out_channels = [384, 192, 384, 48, 128, 128])
         # 4 * 4 * 1024
-        self.stage_4_avgpool = nn.AvgPool(kernel_size=4, stride=1)
+        self.stage_4_avgpool = nn.AvgPool2d(kernel_size=4, stride=1)
         # 1 * 1 * 1024
 
         # stage5 - dropout,linear fc, softmax fc
         self.stage_5_drop = nn.Dropout(0.4)
         self.stage_5_fc = nn.Linear(1024, num_classes)
+        
+        self.bn = nn.BatchNorm1d(num_classes)
+        self.softmax = nn.Softmax()
+        
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            if isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+            if isinstance(m, nn.Linear):
+                m.bias.data.zero_()
+
 
     def forward(self, x):
         out = self.stage_1(x)
@@ -191,9 +208,11 @@ class GoogLeNet(nn.Module):
         out = out.reshape(out.size(0), -1)
         out = self.stage_5_drop(out)
         out = self.stage_5_fc(out)
-        out = F.softmax(out)
+        
+        out = self.bn(out)
+#         out = self.softmax(out)
 
-        return [out, auc_output_1, auc_output_2]
+        return (out, auc_output_1, auc_output_2)
 
 class googlenet_model(object):
 
@@ -210,11 +229,11 @@ class googlenet_model(object):
         self.save_model_path = save_model_path
         self.save_history_path = save_history_path
 #         self.epochs = epochs
-        self.epochs = 10
+        self.epochs = 20
 #         self.batch_size = batch_size
-        self.batch_size = 20
+        self.batch_size = 30
         self.mode = mode
-        self.learning_rate = 0.0002
+        self.learning_rate = 1e-3
         self.num_classes = 10
         if device == "cuda" and torch.cuda.is_available():
             self.device = torch.device("cuda:1")
@@ -233,43 +252,50 @@ class googlenet_model(object):
         self.val_loss_history = []
         self.train_accuracy_history = []
         self.val_accuracy_history = []
-        self.cur_model_name = os.path.join(self.save_model_path, 'current_google_net_net.t7')
-        self.best_model_name = os.path.join(self.save_model_path, 'best_google_net_net.t7')
+        self.cur_model_name = os.path.join(self.save_model_path, 'current_google_net.t7')
+        self.best_model_name = os.path.join(self.save_model_path, 'best_google_net.t7')
         self.max_loss = 0
         self.min_loss = float("inf")
         
-    # def adjust_learning_rate(self, epoch, optimizer):
-    #     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    #     self.learning_rate *= (0.1 ** (epoch // 30))
-    #     for param_group in optimizer.param_groups:
-    #         param_group['lr'] = self.learning_rate
+    def adjust_learning_rate(self, optimizer):
+        """Sets the learning rate to the initial LR decayed by 5 every epoch"""
+        self.learning_rate *= 0.2 
+        for param_group in optimizer.param_groups:
+            param_group['lr'] = self.learning_rate
 
     def train(self):
-        google_net = GoogLeNet(num_classes=10).to(device).to(self.device)
+        try:
+            google_net = torch.load(self.cur_model_name).to(self.device)
+            print("continue train the last model")
+        except FileNotFoundError:
+            google_net = GoogLeNet(num_classes=10).to(self.device)
+            
         optimizer = Adam(google_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
-        step = 0
+        
+#         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 2, gamma=2) # 每隔两个epoch，2
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=1e-4)
+        
         for epoch in range(self.epochs):
-            
-#             self.adjust_learing_rate(epoch, optimizer)
-            
+            scheduler.step()
             print("Main epoch:{}".format(epoch))
             # count the accuracy when train data
             correct = 0
             total = 0
-
+            step = 0
+             
             for i, (images, labels) in enumerate(self.train_loader):
                 
                 # batch_size=100,所以step = 50000/100 = 500
                 step += 1
-
+                
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # compute output
-                outputs = google_net(images)
-                train_loss = self.criterion(outputs, labels)
+                output, auc_output_1, auc_output_2 = google_net(images)
+                train_loss = self.criterion(output, labels) + 0.3 * self.criterion(auc_output_1, labels) + 0.3 * self.criterion(auc_output_2, labels)
 
                 # compute accuracy
-                _, predicted = torch.max(outputs.data, 1)
+                _, predicted = torch.max(output.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
@@ -277,15 +303,16 @@ class googlenet_model(object):
                 optimizer.zero_grad()
                 train_loss.backward()
                 optimizer.step()
-                print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
+                if step % 100 == 0:
+                    print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
 
                 #show result and save model 
                 # step = epochs * (50000 // batch_size) = 100 * 50000 // 100 = 50000
                 # if (step % 100) == 0:
             # each epoch store the history and accurate
             self.train_loss_history.append(train_loss)
-            self.max_loss = max(self.max_loss, train_loss)
-            self.min_loss = min(self.min_loss, train_loss)
+            self.max_loss = max(self.max_loss, train_loss.item())
+            self.min_loss = min(self.min_loss, train_loss.item())
             # 计算模型在训练集上准确率
             train_accuracy = 100 * correct / total 
             self.train_accuracy_history.append(train_accuracy)
@@ -321,18 +348,18 @@ class googlenet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = google_net(images)
-                val_loss = self.criterion(outputs, labels)
+                output, auc_output_1, auc_output_2 = google_net(images)
+                val_loss = self.criterion(output, labels) + 0.3 * self.criterion(auc_output_1, labels) + 0.3 * self.criterion(auc_output_2, labels)
                 # print(outputs.data.shape, type(outputs.data))
                 # print(outputs.shape, type(outputs))
-                _, predicted = torch.max(outputs.data, 1)
+                _, predicted = torch.max(output.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+            print("current accuracy in the epoch is {}, val loss is {}".format((100 * correct / total),val_loss))
             val_accuracy = 100 * correct / total 
             self.val_loss_history.append(val_loss)
-            self.max_loss = max(self.max_loss, val_loss)
-            self.min_loss = min(self.min_loss, val_loss)
+            self.max_loss = max(self.max_loss, val_loss.item())
+            self.min_loss = min(self.min_loss, val_loss.item())
         return val_accuracy
     
     def test(self):
@@ -349,12 +376,13 @@ class googlenet_model(object):
                 images = images.to(self.device)
                 labels = labels.to(self.device)
                 # forward pass
-                outputs = google_net(images)
+                out, auc_output_1, auc_output_2 = google_net(images)
+                outputs = out + 0.3 * auc_output_1 + 0.3 * auc_output_2 
                 
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+            print("current accuracy in this epoch is {}".format(100 * correct / total ))
 
     def plot_curve(self): 
 
@@ -389,7 +417,7 @@ class googlenet_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle='-', label='valid_accuracy', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
 
-        fig_name = self.save_history_path + "/googlenet_accuracy_history"
+        fig_name = os.path.join(self.save_history_path, 'googlenet_accuracy_history')
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save accuracy history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
@@ -420,7 +448,7 @@ class googlenet_model(object):
         plt.plot(x_axis, y_axis, color='y', linestyle=':', label='val_loss', lw=2)
         plt.legend(loc=4, fontsize=legend_fontsize)
         
-        fig_name = self.save_history_path + "/googlenet_loss_history"
+        fig_name = os.path.join(self.save_history_path, 'googlenet_loss_history')
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)

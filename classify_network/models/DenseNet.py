@@ -245,8 +245,8 @@ class densenet_model(object):
         self.val_loss_history = []
         self.train_accuracy_history = []
         self.val_accuracy_history = []
-        self.cur_model_name = os.path.join(self.save_model_path, 'current_densenet_net.t7')
-        self.best_model_name = os.path.join(self.save_model_path, 'best_densenet_net.t7')
+        self.cur_model_name = os.path.join(self.save_model_path, 'current_densenet.t7')
+        self.best_model_name = os.path.join(self.save_model_path, 'best_densenet.t7')
         self.max_loss = 0
         self.min_loss = float("inf")
         
@@ -257,7 +257,12 @@ class densenet_model(object):
     #         param_group['lr'] = self.learning_rate
 
     def train(self):
-        dense_net = DenseNet(32, 65, 0.5, num_classes=self.num_classes, useBottleneck=True).to(self.device)
+        try:
+            dense_net = torch.load(self.cur_model_name).to(self.device)
+            print("continue train the last model")
+        except FileNotFoundError:
+            dense_net = DenseNet(32, 65, 0.5, num_classes=self.num_classes, useBottleneck=True).to(self.device)
+            
         optimizer = Adam(dense_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
         step = 0
         for epoch in range(self.epochs):
@@ -436,3 +441,17 @@ class densenet_model(object):
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

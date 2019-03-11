@@ -178,8 +178,8 @@ class resnext_model(object):
         self.val_loss_history = []
         self.train_accuracy_history = []
         self.val_accuracy_history = []
-        self.cur_model_name = os.path.join(self.save_model_path, 'current_resnext_net.t7')
-        self.best_model_name = os.path.join(self.save_model_path, 'best_resnext_net.t7')
+        self.cur_model_name = os.path.join(self.save_model_path, 'current_resnext.t7')
+        self.best_model_name = os.path.join(self.save_model_path, 'best_resnext.t7')
         self.max_loss = 0
         self.min_loss = float("inf")
         
@@ -190,7 +190,12 @@ class resnext_model(object):
     #         param_group['lr'] = self.learning_rate
 
     def train(self):
-        resnext = ResNeXt(ResNeXtBottleBlock, depth=29, cardinality=16, num_classes=self.num_classes).to(self.device)
+        try:
+            resnext = torch.load(self.cur_model_name).to(self.device)
+            print("continue train the last model")
+        except FileNotFoundError:
+            resnext = ResNeXt(ResNeXtBottleBlock, depth=29, cardinality=16, num_classes=self.num_classes).to(self.device)
+            
         optimizer = Adam(resnext.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
         step = 0
         for epoch in range(self.epochs):

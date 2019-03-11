@@ -125,6 +125,13 @@ class VGG16_Net(nn.Module):
             nn.Linear(4096, num_classes),
             nn.BatchNorm1d(num_classes),
             nn.Softmax())
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            if isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
 
 
     def forward(self, x):
@@ -191,17 +198,16 @@ class vgg16net_model(object):
     #         param_group['lr'] = self.learning_rate
 
     def train(self):
-        vgg16_net = torch.load(self.current_model_name).to(self.device) 
-        
-        if vgg16_net is not None:
+        try:
+            vgg16_net = torch.load(self.cur_model_name).to(self.device)
             print("continue train the last model")
-        else:
+        except FileNotFoundError:
             vgg16_net = VGG16_Net(self.num_classes).to(self.device)
-
-        optimizer = Adam(vgg16_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
-        step = 0
-        for epoch in range(self.epochs):
             
+        optimizer = Adam(vgg16_net.parameters(), betas=(.5, 0.999), lr=self.learning_rate)
+        
+        for epoch in range(self.epochs):
+            step = 0
 #             self.adjust_learing_rate(epoch, optimizer)
             
             print("Main epoch:{}".format(epoch))
@@ -229,7 +235,8 @@ class vgg16net_model(object):
                 optimizer.zero_grad()
                 train_loss.backward()
                 optimizer.step()
-                print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
+                if step % 100 == 0:
+                    print("epoch:{}, step:{}, loss:{}, accuracy:{}".format(epoch, step, train_loss.item(),(100 * correct / total)))
 
                 #show result and save model 
                 # step = epochs * (50000 // batch_size) = 100 * 50000 // 100 = 50000
@@ -280,7 +287,7 @@ class vgg16net_model(object):
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+            print("current accuracy in this epoch is {}".format(100 * correct / total ))
             val_accuracy = 100 * correct / total 
             self.val_loss_history.append(val_loss)
             self.max_loss = max(self.max_loss, val_loss)
@@ -306,7 +313,7 @@ class vgg16net_model(object):
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-            print("current accuracy in each batch size is {}".format(100 * correct / total ))
+            print("current accuracy in this epoch is {}".format(100 * correct / total ))
 
     def plot_curve(self): 
 
@@ -376,6 +383,3 @@ class vgg16net_model(object):
         fig.savefig(fig_name, dpi=dpi, bbox_inches='tight')
         print ('---- save loss_history figure {} into {}'.format(title, self.save_history_path))
         plt.close(fig)
-
-    def continue_train(self):
-        
