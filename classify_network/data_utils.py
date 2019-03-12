@@ -15,8 +15,12 @@ def load_data(data_folder, net_name):
             [transforms.RandomSizedCrop(227),transforms.RandomHorizontalFlip(),transforms.ToTensor(),transforms.Normalize(mean, std)])
         test_transform = transforms.Compose(
             [transforms.Scale(256),transforms.CenterCrop(227),transforms.ToTensor(),transforms.Normalize(mean, std)])
-        
-    else: 
+    elif net_name == "vgg16net" or net_name =="resnet" or net_name=="resnet_bottleneck" or net_name == "densenet" or net_name == "senet":
+        train_transform = transforms.Compose(
+            [transforms.RandomSizedCrop(224),transforms.RandomHorizontalFlip(),transforms.ToTensor(),transforms.Normalize(mean, std)])
+        test_transform = transforms.Compose(
+            [transforms.Scale(256),transforms.CenterCrop(224),transforms.ToTensor(),transforms.Normalize(mean, std)])        
+    else: #net_name =="resnext" or net_name=="googlenet"
         train_transform = transforms.Compose(
             [transforms.RandomHorizontalFlip(), transforms.RandomCrop(32, padding=4), transforms.ToTensor(),
              transforms.Normalize(mean, std)])

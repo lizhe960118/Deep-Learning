@@ -1,12 +1,19 @@
 import argparse
 from models.AlexNet import alexnet_model
+from models.Vgg16Net import vgg16net_model
+from models.ResNet import resnet_model
+from models.ResNetBottleneck import resnet_bottleneck_model
+from models.ResNeXt import resnext_model
+from models.DenseNet import densenet_model
+from models.GoogLeNet import googlenet_model
+from models.SENet import senet_model
 
 from data_utils import check_folder
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=300, help='The number of epochs to run')
-    parser.add_argument('--batch_size', type=int, default=100, help='The size of batch')
+    parser.add_argument('--epochs', type=int, default=3, help='The number of epochs to run')
+    parser.add_argument('--batch_size', type=int, default=10, help='The size of batch')
     parser.add_argument('--dataset_path', type=str, default='./data/',
                         help='Directory name to load data')
     parser.add_argument('--save_model_path', type=str, default='./save/model/',
@@ -62,16 +69,16 @@ def main():
                args.batch_size,
                args.device,
                args.mode)
-    elif args.model == " resnext":
-        model =  resnext_model(args.dataset_path,
-               args.save_path,
+    elif args.model == "resnext":
+        model = resnext_model(args.dataset_path,
+               args.save_model_path,
                args.save_history_path,
                args.epochs,
                args.batch_size,
                args.device,
                args.mode)
     elif args.model == "densenet":
-        model = dense_model(args.dataset_path,
+        model = densenet_model(args.dataset_path,
                args.save_model_path,
                args.save_history_path,
                args.epochs,
@@ -86,6 +93,14 @@ def main():
                args.batch_size,
                args.device,
                args.mode)
+    elif args.model == "senet":
+        model = senet_model(args.dataset_path,
+               args.save_model_path,
+               args.save_history_path,
+               args.epochs,
+               args.batch_size,
+               args.device,
+               args.mode)
     else:
         model = None
         print("model is not exist")
@@ -94,7 +109,7 @@ def main():
         if args.mode == "train":
             model.train()
         else:
-            model.validate()    
+            model.test()    
 
 if __name__ == "__main__":
     main()

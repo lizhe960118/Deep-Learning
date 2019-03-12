@@ -46,10 +46,21 @@ resnet升级版，当前层和之间的每一层都有连接，这里是concatna
 测试：python main.py --model googlenet --mode test
 ### senet
 对通道加权
-
+训练：python main.py --model senet --mode train 
+测试: python main.py --model senet --mode test
+### csrnet
+使用了空洞卷积
+### Xception
+https://blog.csdn.net/u014380165/article/details/75142710
 
 ## model
 对于每个model，先定义它的网络层结构，然后定义一个类实现，类中会有_train,_test方法，用于模型的训练和测试。
+
+## debug
+### 训练loss不下降
+调小learning_rate或者batch_size
+### 训练准确率上不去
+注意参数的初始化
 
   
 
