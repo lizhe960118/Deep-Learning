@@ -15,8 +15,6 @@ class yoloLoss(nn.Module):
         self.l_coord = l_coord # 对是物体的块loss的加权
         self.l_noobj = l_noobj # 对非物体块loss的加权
 
-        self.grad_num = S
-
     def compute_iou(self, box1, box2):
         '''Compute the intersection over union of two set of boxes, each box is [x1,y1,x2,y2].
         其实不再只是求矩形a和矩形b之间的IOU，而是求box1中的所有矩形和box2中矩阵，两两之间的intersection
@@ -93,7 +91,7 @@ class yoloLoss(nn.Module):
         coo_not_response_mask = torch.cuda.ByteTensor(box_target.size())
         coo_not_response_mask.zero_()
 
-        box_target_iou = torch.zeros(box_target.size()).cuda() # [Block_of_has_object * 2, 5] 
+        # box_target_iou = torch.zeros(box_target.size()).cuda() # [Block_of_has_object * 2, 5] 
 
         for i in range(0,box_target.size()[0],2): #choose the best iou box
             
@@ -101,17 +99,17 @@ class yoloLoss(nn.Module):
             box1_xyxy = Variable(torch.FloatTensor(box1.size()))
             # grad_num must be same in encoder and decoder
             # 计算box_1中两个框的位置
-            box1_xyxy[:,:2] = box1[:,:2] / self.grad_num - 0.5 * box1[:,2:4] # (x1, y1) = ((center_x - w/2),(center_y - h/2) 
-            box1_xyxy[:,2:4] = box1[:,:2] / self.grad_num + 0.5 * box1[:,2:4] # (x2, y2) = ((center_x + w/2),(center_y + h/2) 
+            box1_xyxy[:,:2] = box1[:,:2]  - 0.5 * box1[:,2:4] # (x1, y1) = ((center_x - w/2),(center_y - h/2) 
+            box1_xyxy[:,2:4] = box1[:,:2] + 0.5 * box1[:,2:4] # (x2, y2) = ((center_x + w/2),(center_y + h/2) 
 
             box2 = box_target[i].view(-1,5) # 取一个框就行，因为两个框相同
             box2_xyxy = Variable(torch.FloatTensor(box2.size()))
-            box2_xyxy[:,:2] = box2[:,:2] / self.grad_num - 0.5 * box2[:,2:4]
-            box2_xyxy[:,2:4] = box2[:,:2] / self.grad_num + 0.5 * box2[:,2:4]
+            box2_xyxy[:,:2] = box2[:,:2]  - 0.5 * box2[:,2:4]
+            box2_xyxy[:,2:4] = box2[:,:2]  + 0.5 * box2[:,2:4]
             iou = self.compute_iou(box1_xyxy[:,:4],box2_xyxy[:,:4]) # [2,1]
 
             max_iou,max_index = iou.max(0)
-            max_index = max_index.data.cuda() # 取出max_index (0 or 1)
+            # max_index = max_index.data.cuda() # 取出max_index (0 or 1)
             
             coo_response_mask[i + max_index] = 1 # 选出pred的两个框中的一个
             coo_not_response_mask[i + 1 - max_index] = 1 # 两个框中没有选择的
@@ -121,17 +119,20 @@ class yoloLoss(nn.Module):
             # intersection over union (IOU) between the predicted box
             # and the ground truth
             #####
-            box_target_iou[i + max_index,torch.LongTensor([4]).cuda()] = (max_iou).data.cuda() # confidence对应位置填入max_iou
+            # box_target_iou[i + max_index,torch.LongTensor([4]).cuda()] = (max_iou).data.cuda() # confidence对应位置填入max_iou
+            box_target[i + max_index，4] = max_iou
 
-        box_target_iou = Variable(box_target_iou).cuda()
+        # box_target_iou = Variable(box_target_iou).cuda()
 
         #1.response loss
         box_pred_response = box_pred[coo_response_mask].view(-1,5) # 预测的置信度
-        box_target_response_iou = box_target_iou[coo_response_mask].view(-1,5) # 实际算得的iou
 
+        # box_target_response_iou = box_target_iou[coo_response_mask].view(-1,5) # 实际算得的iou
+        # 其实应该置换box_target的4通道
         box_target_response = box_target[coo_response_mask].view(-1,5)
 
-        contain_loss = F.mse_loss(box_pred_response[:,4],box_target_response_iou[:,4],size_average=False)
+        # contain_loss = F.mse_loss(box_pred_response[:,4],box_target_response_iou[:,4],size_average=False)
+        contain_loss = F.mse_loss(box_pred_response[:,4],box_target_response[:,4],size_average=False)
         # 位置损失
         loc_loss = F.mse_loss(box_pred_response[:,:2],box_target_response[:,:2],size_average=False) + F.mse_loss(torch.sqrt(box_pred_response[:,2:4]),torch.sqrt(box_target_response[:,2:4]),size_average=False)
         

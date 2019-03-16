@@ -89,7 +89,8 @@ class yoloDataset(data.Dataset):
         # plt.show()
         # #debug
         h,w,_ = img.shape # 得到图片的高，宽
-        boxes /= torch.Tensor([w,h,w,h]).expand_as(boxes) # 将[w, h, w, h] 乘以图片中框的个数，然后归一化（boxes 0-1）
+        boxes /= torch.Tensor([w,h,w,h]).expand_as(boxes) # 将[w, h, w, h] 乘以图片中框的个数，
+        # 即将每一个框归一化（boxes 0-1）
         img = self.BGR2RGB(img) #because pytorch pretrained model use RGB
         img = self.subMean(img,self.mean) #减去均值
         img = cv2.resize(img,(self.image_size,self.image_size)) # 448 * 448
@@ -105,6 +106,7 @@ class yoloDataset(data.Dataset):
     def encoder(self,boxes,labels):
         '''
         # 输入单个图片里面的所有box及其对应label
+        这里只对框中心点所在的网格进行处理：将其通道4,9置为1，设置类别，位置偏移通道存入偏移量
         boxes (tensor) [[x1,y1,x2,y2],[]]
         labels (tensor) [...]
         return 7x7x30
@@ -114,23 +116,26 @@ class yoloDataset(data.Dataset):
         target = torch.zeros((grid_num,grid_num,30)) # 7 * 7 * 30的张量
         cell_size = 1./grid_num # 网格大小 1/7
         wh = boxes[:,2:]-boxes[:,:2] # [x1, y1, x2, y2]: w = x2 - x1; h = y2 - y1
-        cxcy = (boxes[:,2:]+boxes[:,:2])/2 # 中心点坐标 [center_point(x1,y1), 2, 3]
+        cxcy = (boxes[:,2:]+boxes[:,:2])/2 # 中心点坐标 [center_point(x1,y1), ..]
         for i in range(cxcy.size()[0]): # 框有多少个
             cxcy_sample = cxcy[i] # 取中心点
-            ij = (cxcy_sample/cell_size).ceil() - 1 # .ceil()向上取整（0-13）找到中心点对应的是哪个网格
+            ij = (cxcy_sample/cell_size).ceil() - 1 # .ceil()向上取整（0-13）找到中心点对应的是哪个网格块
 
             target[int(ij[1]),int(ij[0]),4] = 1 # 将当前块的通道4置为1，以确定有物体
             target[int(ij[1]),int(ij[0]),9] = 1 # 将当前块的通道9置为1
 
             target[int(ij[1]),int(ij[0]),int(labels[i])+9] = 1 # 将通道【10：】之后物体的类别置为1
 
-            xy = ij*cell_size #匹配到的网格的左上角相对坐标（找到的是（1/7， 1/7）这种）(0, 1)
-            delta_xy = (cxcy_sample - xy)/cell_size # 中心点距离左上角的大小, * 7,得到在输出特征图中的大小(0, 7)
+            xy = ij*cell_size #匹配到的网格的左上角相对坐标（找到的是（1/7， 1/7）这种），范围为(0, 1)
+            # delta_xy = (cxcy_sample - xy)/cell_size 
+            delta_xy = cxcy_sample - xy
+            # 中心点距离块左上角的大小, * 7,得到在输出特征图中的大小(0, 7)
             target[int(ij[1]),int(ij[0]),2:4] = wh[i]
             target[int(ij[1]),int(ij[0]),:2] = delta_xy # (delta_x, delta_y, w, h)
+
             target[int(ij[1]),int(ij[0]),7:9] = wh[i] 
             target[int(ij[1]),int(ij[0]),5:7] = delta_xy
-            # 对于当前块，对于框的中心点（x + delta_x / 7, y + delta_y/7) * (img.shape)
+            # 对于当前块，对于框的中心点（x + delta_x, y + delta_y) * (img.shape)
             # 这个中心点对应的框的宽, 高为（w, h) * (img.shape)
         return target
 

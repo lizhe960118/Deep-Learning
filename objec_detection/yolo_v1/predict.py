@@ -76,7 +76,7 @@ def decoder(pred):
                     contain_prob = torch.FloatTensor([pred[i,j,b*5+4]]) # 当前框的置信率
 
                     xy = torch.FloatTensor([j,i]) * cell_size #cell左上角  up left of cell （块的左上角
-                    box[:2] = box[:2]*cell_size + xy # return cxcy relative to image ，这里求得中心点坐标
+                    box[:2] = box[:2] + xy # return cxcy relative to image ，这里求得中心点坐标
                     #box[:2]保存的是[delta_x, delta_y], 即[cx, cy]是框中心点距离左上角的大小， center_x = block_up_left_x + cx
                     
                     box_xy = torch.FloatTensor(box.size()) # 转换成xy形式    convert[cx,cy,w,h] to [x1,xy1,x2,y2]
@@ -171,7 +171,7 @@ def predict_gpu(model,image_name,root_path=''):
     boxes, cls_indexs, probs =  decoder(pred)
 
     for i,box in enumerate(boxes):
-        x1 = int(box[0]*w)
+        x1 = int(box[0]*w) # 拓展到原图中
         x2 = int(box[2]*w)
         y1 = int(box[1]*h)
         y2 = int(box[3]*h)
