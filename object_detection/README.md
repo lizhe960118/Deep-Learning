@@ -1,4 +1,5 @@
-## YOLO
+##YOLO
+
 ### yolo-v1
 将识别问题转化为分类问题，将原始图片分成7x7的块，每个块对应两个框和一种分类，每个框有（x,y,w,h,confidence)5个参数，分类有20个通道，总共（5 * 2 + 20）=30个通道，神经网络输出7x7x30的张量。
 之前对训练图片进行处理，每个图片得到target_tensor,神经网络得到的pred_tensor，二者计算loss。
@@ -18,18 +19,23 @@
 - darknet53
 - 上采样然后concat，类似于FPN
 
-## ssd（单图像多目标框检测）
+##ssd（单图像多目标框检测）
+
 - 多尺度预测：使用大小不同的特征检测不同尺度的目标
 - 多种宽高比的default box
 - 数据增强：放大:每个patch的大小为原图大小的[0.1, 1],宽高比在1/2,到2之间；缩小：创建16倍与原图大小的画布，将原图放置其中
 
-### R-CNN(region-based cnn)
+##R-CNN(region-based cnn)
+
 通过selective search选出候选框，然后对应到原图片中，对crop(裁剪)后的图片resize到同样大小通过cnn进行分类
-### SPP-Net(Spatial Pyramid Pooling) 空间金字塔池化
+##SPP-Net(Spatial Pyramid Pooling) 空间金字塔池化
+
 实现了将输入任意尺度的特征图组合成特定维度的输出
-### fast r-cnn
+##fast r-cnn
+
 输入图片，cnn提取特征之后的到m*m的特征图，通过selective search选出候选框，对应到卷积提取过的特征图中,得到(WxH)的特征图，对这个特征图做ROIpooling（adaptivePooling），得到固定大小的输出特征，在此基础上确定回归和分类
-### faster rcnn
+##faster rcnn
+
 特点：预测的tx是预测框相对当前锚框的缩放偏移量
 在第五个卷积层后加入RegionProposalNetwork，用于提取建议框，对于卷积后特征图上的每一个点（共S=hh*ww个），分配A个锚框。
 
