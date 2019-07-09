@@ -1,5 +1,7 @@
 object detection
 
+
+
 ##YOLO
 
 ### yolo-v1
@@ -41,7 +43,7 @@ object detection
 特点：预测的tx是预测框相对当前锚框的缩放偏移量
 在第五个卷积层后加入RegionProposalNetwork，用于提取建议框，对于卷积后特征图上的每一个点（共S=hh*ww个），分配A个锚框。
 
-![image](https://github.com/lizhe960118/Deep-Learning/blob/master/object_detection/images/faster-rcnn.png)
+![image](https://github.com/lizhe960118/Deep-Learning/blob/master/object_detection/images/faster_rcnn.png)
 
 rpn中:
 卷积层经过3*3卷积集中信息，之后使用1x1卷积构造想输入的特征
@@ -69,7 +71,7 @@ sample_rois是第二次得到的建议框，框数量128，正类比率0.25， m
 
 sample_rois,image_size,feature输入到ROIPooling层中，每个roi得到固定输出，[S, roipoolsize**2],经过全连接层4096,4096，对应设置输出21， 21*4，得到，roi_cls_loc[S, 21x4],根据gt_roi_label,选出对应层的loc,即为roi_loc；roi_scores[S, 21],将与gt_roi_label计算交叉熵损失
 
-!(image)[https://github.com/lizhe960118/Deep-Learning/blob/master/object_detection/images/faster-rcnn的副本.png]
+![image](https://github.com/lizhe960118/Deep-Learning/blob/master/object_detection/images/faster-rcnn的副本.png)
 
 ### FPN（特征金字塔网络）
 同时利用低层特征高分辨率和高层的语义信息，通过融合这些不同的层的特征达到预测的结果，预测是在每个融合后的特征层上单独进行的。
