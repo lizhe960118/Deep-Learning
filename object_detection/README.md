@@ -1,6 +1,6 @@
-object detection
+object detection is the basic project in CV
 
-
+#object detection
 
 ##YOLO
 
@@ -23,6 +23,8 @@ object detection
 - darknet53
 - 上采样然后concat，类似于FPN
 
+
+
 ##ssd（单图像多目标框检测）
 
 - 多尺度预测：使用大小不同的特征检测不同尺度的目标
@@ -32,12 +34,15 @@ object detection
 ##R-CNN(region-based cnn)
 
 通过selective search选出候选框，然后对应到原图片中，对crop(裁剪)后的图片resize到同样大小通过cnn进行分类
+
 ##SPP-Net(Spatial Pyramid Pooling) 空间金字塔池化
 
-实现了将输入任意尺度的特征图组合成特定维度的输出
+实现了将输入任意尺度的特征图组合成特定维度的输出<br>
+
 ##fast r-cnn
 
-输入图片，cnn提取特征之后的到m*m的特征图，通过selective search选出候选框，对应到卷积提取过的特征图中,得到(WxH)的特征图，对这个特征图做ROIpooling（adaptivePooling），得到固定大小的输出特征，在此基础上确定回归和分类
+输入图片，cnn提取特征之后的到m*m的特征图，通过selective search选出候选框，对应到卷积提取过的特征图中,得到(WxH)的特征图，对这个特征图做ROIpooling（adaptivePooling），得到固定大小的输出特征，在此基础上确定回归和分类<br>
+
 ##faster rcnn
 
 特点：预测的tx是预测框相对当前锚框的缩放偏移量
@@ -73,14 +78,17 @@ sample_rois,image_size,feature输入到ROIPooling层中，每个roi得到固定�
 
 ![image](https://github.com/lizhe960118/Deep-Learning/blob/master/object_detection/images/faster-rcnn的副本.png)
 
-### FPN（特征金字塔网络）
+##FPN（特征金字塔网络）
+
 同时利用低层特征高分辨率和高层的语义信息，通过融合这些不同的层的特征达到预测的结果，预测是在每个融合后的特征层上单独进行的。
 
-### FocalLoss（聚焦损失函数）
+##FocalLoss（聚焦损失函数）
+
 Focal loss 主要是为了解决one-stage目标检测中正负样本比例严重失衡的问题，该损失函数降低了大量简单负样本在训练中所占的权重。样本越易分，pt越大，则贡献的loss就越小.（这里之后就不像two_stage算法一样做正负样本的均衡）
 [Focal loss](https://www.cnblogs.com/king-lps/p/9497836.html)
 
-### 术语
+##术语
+
 - SPP： spatial pyramid pooling(空间金字塔）  
 将按照给定的几种比例构造网格图，然后对应比例放大到图片中，对于每个网格块做maxpool，得到（网格块个数）* channels的特征。  
 具体程序中：input： m * m, 网格块比例（n * n),使用 kernel_size = (m / n)向上取整，stride = （m / n)向下取整的卷积
@@ -93,7 +101,8 @@ ouput feature map: pooled_w * pooled_h
 - anchor: 锚  
 - NMS（NonMaximumSuppresion) 非极大值抑制（选出置信度最高的框后，将与他相交的IOU大于阈值的框去掉
 
-### 评价标准
+##评价标准
+
 - mAP（mean Average Precision)
 用预测框和实际框计算出的IOU值与设定的IOU阈值比较，可以计算出某张图像中某个类C的正确检测次数A;对于每个图像，我们知道该图像中给定类别C的实际目标的数量B.则该类C的精度, P=(A/B)
 有100张图像，可得到100个精度值，这100个精度的平均值，得到的是该类C的平均精度，AP=(sum(P)/N_images)
