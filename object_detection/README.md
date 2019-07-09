@@ -4,14 +4,14 @@ object detection is the basic project in CV
 
 ## YOLO
 
-###yolo-v1
+### yolo-v1
 
 将识别问题转化为分类问题，将原始图片分成7x7的块，每个块对应两个框和一种分类，每个框有（x,y,w,h,confidence)5个参数，分类有20个通道，总共（5 * 2 + 20）=30个通道，神经网络输出7x7x30的张量。
 之前对训练图片进行处理，每个图片得到target_tensor,神经网络得到的pred_tensor，二者计算loss。
 在预测时，神经网络得到predict_tensor,要将此张量转化为图片中的标注框及其对应类别和预测概率。
 特定：预测的框的中心一定在此单元格内，预测的x加上单元格的位置就可以得到预测框中心的坐标。
 
-###yolo-v2
+### yolo-v2
 
 改进：
 - 使用BN（批处理正则化）
@@ -20,7 +20,7 @@ object detection is the basic project in CV
 - 使用kmeans聚类来找到模板框（piror）的大小
 - 直接预测相对于网格单元左上角的相对位置（RNN预测相对于锚框中心的位置）
 
-###yolo-v3
+### yolo-v3
 
 - 使用leaky Relu 作为激活函数
 - darknet53
