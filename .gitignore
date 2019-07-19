@@ -20,6 +20,8 @@
 *.zip
 *.tar.gz
 *.rar
+*.whl
+*.so
 
 *jpg
 
